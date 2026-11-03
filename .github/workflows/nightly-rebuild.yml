@@ -1,0 +1,18 @@
+# Rebuilds the site every night so new photos, descriptions and reviews from Hospitable show up.
+# Prices and availability are always live; this only refreshes the page content.
+# Needs a repository secret CF_DEPLOY_HOOK (a Cloudflare Pages deploy hook URL).
+name: Nightly rebuild
+on:
+  schedule:
+    - cron: '17 9 * * *'
+  workflow_dispatch: {}
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Cloudflare Pages build
+        env:
+          HOOK: ${{ secrets.CF_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$HOOK" ]; then echo "CF_DEPLOY_HOOK not set yet, skipping."; exit 0; fi
+          curl -fsS -X POST "$HOOK" > /dev/null && echo "Rebuild started."
