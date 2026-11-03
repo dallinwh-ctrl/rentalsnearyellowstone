@@ -3,6 +3,9 @@
   "name": "rentalsnearyellowstone",
   "main": "worker/index.js",
   "compatibility_date": "2026-10-01",
+  // Keep the free *.workers.dev address on so the site can be previewed before the real domain points here.
+  "workers_dev": true,
+  "preview_urls": true,
   // Builds the static pages before every deploy. With the HOSPITABLE_TOKEN build variable set,
   // pages get live photos and reviews; without it they use sample data.
   "build": { "command": "npm run build" },
