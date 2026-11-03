@@ -99,7 +99,10 @@
           const r = results[card.dataset.id];
           const price = card.querySelector('.card-price');
           if (r && r.available && r.total_without_taxes) {
-            price.textContent = `${r.total_without_taxes} for ${nights} night${nights === 1 ? '' : 's'}, before taxes`;
+            const whole = r.total_without_taxes_amount > 0
+              ? '$' + Math.round(r.total_without_taxes_amount).toLocaleString('en-US')
+              : r.total_without_taxes;
+            price.textContent = `${whole} for ${nights} night${nights === 1 ? '' : 's'}, before taxes`;
             price.hidden = false;
           } else {
             price.hidden = true;
@@ -164,7 +167,7 @@
     input('children').value = stay.children;
 
     const days = new Map(); // date -> day info
-    const loaded = new Set(); // "YYYY-MM" months fetched
+    const loaded = new Map();
     const today = todayLocal();
     const first = parse(today); first.setUTCDate(1);
     let view = start ? parse(start) : new Date(first);
@@ -189,19 +192,23 @@
       });
     });
 
-    async function loadMonths(from) {
+    // month key "YYYY-MM" -> promise of that month's data, so repeated clicks share one request
+    function loadMonths(from) {
       const key = ymd(from).slice(0, 7);
-      if (loaded.has(key)) return;
-      loaded.add(key);
+      if (loaded.has(key)) return loaded.get(key);
       const s = ymd(from);
       const e = new Date(from); e.setUTCMonth(e.getUTCMonth() + 2); e.setUTCDate(e.getUTCDate() + 7);
       const next = new Date(from); next.setUTCMonth(next.getUTCMonth() + 1);
-      loaded.add(ymd(next).slice(0, 7));
-      try {
-        const res = await fetch(`/api/calendar?${new URLSearchParams({ id, start: s < today ? today : s, end: ymd(e) })}`);
-        const data = await res.json();
-        if (res.ok) for (const d of data.days) days.set(d.date, d);
-      } catch { /* calendar is a helper; the quote is still the final check */ }
+      const p = (async () => {
+        try {
+          const res = await fetch(`/api/calendar?${new URLSearchParams({ id, start: s < today ? today : s, end: ymd(e) })}`);
+          const data = await res.json();
+          if (res.ok) for (const d of data.days) days.set(d.date, d);
+        } catch { /* calendar is a helper; the quote is still the final check */ }
+      })();
+      loaded.set(key, p);
+      loaded.set(ymd(next).slice(0, 7), p);
+      return p;
     }
 
     function nightOk(date) {
@@ -224,9 +231,12 @@
       return nightsBetween(start, date) >= ((s && s.min_stay) || 1);
     }
 
+    let drawing = 0;
     async function draw() {
-      calEl.innerHTML = '<p>Loading calendar…</p>';
+      const ticket = ++drawing;
+      if (!loaded.has(ymd(view).slice(0, 7))) calEl.innerHTML = '<p>Loading calendar…</p>';
       await loadMonths(new Date(view));
+      if (ticket !== drawing) return; // a newer click already redrew
       const choosingEnd = Boolean(start && !end);
       const y = view.getUTCFullYear();
       const m = view.getUTCMonth();

@@ -58,9 +58,11 @@ input { font: inherit; font-weight: 400; font-size: 16px; padding: 11px 12px; bo
 .hero h1 { font-size: clamp(34px, 5vw, 58px); max-width: 820px; }
 .lede { margin: 0; font-size: 19px; max-width: 640px; color: var(--pine-tint); }
 .proof { margin: 0; font-weight: 600; }
-.search { margin-top: 8px; background: var(--surface); border-radius: var(--radius); padding: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-width: 980px; }
+.search { margin-top: 8px; background: var(--surface); border-radius: var(--radius); padding: 12px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; max-width: 980px; }
 .search .btn { grid-column: 1 / -1; }
-@media (min-width: 860px) { .search { grid-template-columns: 1.3fr 1.3fr .8fr .8fr 1.4fr; align-items: end; } .search .btn { grid-column: auto; } }
+.search > * { min-width: 0; }
+.search input[type=date] { -webkit-appearance: none; appearance: none; min-height: 46px; }
+@media (min-width: 860px) { .search { grid-template-columns: minmax(0,1.3fr) minmax(0,1.3fr) minmax(0,.8fr) minmax(0,.8fr) minmax(0,1.4fr); align-items: end; } .search .btn { grid-column: auto; } }
 .search-status { margin: 0; min-height: 1.5em; color: var(--pine-tint); }
 
 /* sections, chips, grid */
@@ -122,7 +124,7 @@ input { font: inherit; font-weight: 400; font-size: 16px; padding: 11px 12px; bo
 /* booking box */
 .book { flex: 1 1 340px; max-width: 440px; position: sticky; top: 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 6px 24px rgba(24,36,31,.08); }
 @media (max-width: 899px) { .book { position: static; max-width: none; } }
-.book-dates { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.book-dates { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 .date-btn { min-height: 56px; text-align: left; padding: 8px 12px; border: 1px solid var(--line-2); border-radius: 8px; background: var(--surface); font: inherit; cursor: pointer; display: flex; flex-direction: column; color: var(--ink); }
 .date-btn span { font-size: 13px; font-weight: 600; color: var(--ink-2); }
 .date-btn[aria-expanded="true"] { border-color: var(--pine); box-shadow: 0 0 0 1px var(--pine); }
