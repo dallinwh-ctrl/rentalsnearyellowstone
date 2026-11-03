@@ -19,21 +19,27 @@ Every booking lands in Hospitable like any other direct booking.
 - `data/site.json` holds the phone, email, review line and the "why book direct" text.
 - A GitHub Action rebuilds the site nightly so new photos and reviews appear.
 
-## Hosting (Cloudflare Pages)
+## Hosting (Cloudflare Workers)
 
-1. Cloudflare dashboard → Workers & Pages → Create → Pages → Connect to Git → this repository.
-2. Build command `npm run build`, output directory `dist`.
-3. Settings → Environment variables (Production and Preview): `HOSPITABLE_TOKEN` = a Hospitable
-   personal access token (Hospitable → Apps → API access), marked as a secret.
-4. Settings → Builds → Deploy hooks: create one, and save its URL as the GitHub repository secret
-   `CF_DEPLOY_HOOK` for the nightly rebuild.
-5. Custom domains: add `www.rentalsnearyellowstone.com` and `rentalsnearyellowstone.com`, then set the
-   DNS records Cloudflare shows in Squarespace's DNS settings for the domain.
+The site runs as one Cloudflare Worker (`wrangler.jsonc`): `worker/index.js` answers `/api/*` with the handlers in
+`functions/api/`, and everything else is served from the static files in `dist/`. Pushing to `main` deploys
+automatically (Workers Builds), and `wrangler deploy` runs `npm run build` first.
+
+In the Cloudflare dashboard, on the rentalsnearyellowstone Worker:
+
+1. Settings → Variables and Secrets: `HOSPITABLE_TOKEN` (type Secret), a Hospitable personal access token
+   (Hospitable → Apps → API access). The live prices, calendar and quotes use this.
+2. Settings → Build → Variables and secrets: the same `HOSPITABLE_TOKEN`, so each build pulls real photos,
+   descriptions and reviews.
+3. Settings → Domains & Routes: add `www.rentalsnearyellowstone.com` and `rentalsnearyellowstone.com` as custom
+   domains (the Worker redirects the bare domain to www). This needs the domain's DNS on Cloudflare.
+4. Nightly refresh: create a Cloudflare API token that can edit Workers, or a deploy hook if available, and save it
+   for `.github/workflows/nightly-rebuild.yml` (`CF_DEPLOY_HOOK`).
 
 ## Local preview
 
 ```
 npm run build          # sample data
 HOSPITABLE_TOKEN=... npm run build   # live data
-npx wrangler@3 pages dev dist        # serves the site and the /api functions (put the token in .dev.vars)
+npx wrangler dev                     # serves the site and /api (put HOSPITABLE_TOKEN=... in .dev.vars)
 ```

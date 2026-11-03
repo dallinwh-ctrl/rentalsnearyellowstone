@@ -1,0 +1,17 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "rentalsnearyellowstone",
+  "main": "worker/index.js",
+  "compatibility_date": "2026-10-01",
+  // Builds the static pages before every deploy. With the HOSPITABLE_TOKEN build variable set,
+  // pages get live photos and reviews; without it they use sample data.
+  "build": { "command": "npm run build" },
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "404-page",
+    "html_handling": "auto-trailing-slash",
+    "run_worker_first": ["/api/*"]
+  },
+  "observability": { "enabled": true }
+}
