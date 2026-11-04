@@ -175,9 +175,12 @@ input { font: inherit; font-weight: 400; font-size: 16px; padding: 11px 12px; bo
 /* full photo grid on each home page */
 .photo-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
 @media (min-width: 720px) { .photo-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); } }
-.photo-grid a { display: block; aspect-ratio: 4 / 3; border-radius: 8px; overflow: hidden; background: #C9D8CD; }
-.photo-grid img { width: 100%; height: 100%; object-fit: cover; transition: transform .2s; }
-.photo-grid a:hover img { transform: scale(1.03); }
+.photo-grid li { display: flex; }
+.photo-grid a { display: block; width: 100%; cursor: zoom-in; aspect-ratio: 4 / 3; border-radius: 8px; overflow: hidden; background: #C9D8CD; }
+.photo-grid img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+.photo-grid a:hover { outline: 2px solid var(--pine); outline-offset: 1px; }
+.gallery a { cursor: zoom-in; }
+.gallery img { pointer-events: none; }
 
 /* beds */
 .beds { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
