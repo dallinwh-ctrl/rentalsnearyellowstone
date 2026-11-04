@@ -432,3 +432,6 @@ ${urls.map((u) => `  <url><loc>${SITE.url}${u}</loc><lastmod>${today}</lastmod><
 await writeFile(path.join(DIST, 'robots.txt'), `User-agent: *\nAllow: /\nDisallow: /api/\nSitemap: ${SITE.url}/sitemap.xml\n`);
 
 console.log(`Built ${homes.length} homes into dist/ (${TOKEN ? 'live Hospitable data' : 'sample data'}).`);
+
+// Which commit this build came from (Workers Builds sets WORKERS_CI_COMMIT_SHA), so the live site can be matched to main.
+await writeFile(path.join(DIST, 'version.txt'), `${process.env.WORKERS_CI_COMMIT_SHA || 'local'}\n`);

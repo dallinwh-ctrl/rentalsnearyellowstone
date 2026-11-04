@@ -17,6 +17,7 @@ export default {
     // Send the bare domain to www so there is one address for search engines.
     if (url.hostname === 'rentalsnearyellowstone.com') {
       url.hostname = 'www.rentalsnearyellowstone.com';
+      url.protocol = 'https:';
       return Response.redirect(url.toString(), 301);
     }
     const route = routes[url.pathname];
