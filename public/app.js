@@ -363,22 +363,37 @@
     return String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   }
 
-  function initLightbox() {
+  // Photos: rendered at build time when the build has the Hospitable key; otherwise fetched live here.
+  async function initLightbox() {
     const dlg = document.querySelector('[data-lightbox]');
     const data = document.querySelector('[data-photos]');
-    if (!dlg || !data || typeof dlg.showModal !== 'function') return;
-    const photos = JSON.parse(data.textContent || '[]');
-    if (!photos.length) return;
+    const box = document.querySelector('[data-book]');
+    if (!dlg || !data) return;
+    let photos = JSON.parse(data.textContent || '[]');
+    const title = (document.querySelector('.detail-main h1') || {}).textContent || 'Home';
+    if (photos.length <= 1 && box) {
+      try {
+        const res = await fetch(`/api/photos?id=${encodeURIComponent(box.dataset.id)}`);
+        const body = await res.json();
+        if (res.ok && body.photos && body.photos.length > photos.length) {
+          photos = body.photos;
+          renderPhotos(photos, title);
+        }
+      } catch { /* keep what the page already has */ }
+    }
+    if (!photos.length || typeof dlg.showModal !== 'function') return;
     const img = dlg.querySelector('[data-lb-img]');
     const countEl = dlg.querySelector('[data-lb-count]');
     let i = 0;
-    const show = () => { img.src = photos[i]; img.alt = `Photo ${i + 1} of ${photos.length}`; countEl.textContent = `${i + 1} / ${photos.length}`; };
-    document.querySelectorAll('[data-photo]').forEach((el) => el.addEventListener('click', (e) => {
+    const show = () => { img.src = photos[i].url; img.alt = photos[i].caption || `Photo ${i + 1} of ${photos.length}`; countEl.textContent = `${i + 1} / ${photos.length}`; };
+    document.addEventListener('click', (e) => {
+      const el = e.target.closest('[data-photo]');
+      if (!el) return;
       e.preventDefault();
       i = Number(el.dataset.photo) || 0;
       show();
       dlg.showModal();
-    }));
+    });
     dlg.querySelector('[data-lb-close]').addEventListener('click', () => dlg.close());
     dlg.querySelector('[data-lb-prev]').addEventListener('click', () => { i = (i - 1 + photos.length) % photos.length; show(); });
     dlg.querySelector('[data-lb-next]').addEventListener('click', () => { i = (i + 1) % photos.length; show(); });
@@ -386,5 +401,22 @@
       if (e.key === 'ArrowLeft') { i = (i - 1 + photos.length) % photos.length; show(); }
       if (e.key === 'ArrowRight') { i = (i + 1) % photos.length; show(); }
     });
+  }
+
+  function renderPhotos(photos, title) {
+    const alt = (p, i) => esc(p.caption || `${title} photo ${i + 1}`);
+    const gallery = document.querySelector('[data-gallery]');
+    if (gallery) {
+      gallery.innerHTML = photos.slice(0, 5).map((p, i) =>
+        `<a class="g${i}" href="${esc(p.url)}" data-photo="${i}"><img src="${esc(i === 0 ? p.url : p.thumb)}" alt="${alt(p, i)}"></a>`).join('')
+        + `<button type="button" class="btn-ghost all-photos" data-photo="0">See all ${photos.length} photos</button>`;
+    }
+    const grid = document.querySelector('[data-photo-grid]');
+    const section = document.querySelector('[data-photo-section]');
+    if (grid && section) {
+      grid.innerHTML = photos.map((p, i) =>
+        `<li><a href="${esc(p.url)}" data-photo="${i}"><img src="${esc(p.thumb)}" alt="${alt(p, i)}" loading="lazy" width="400" height="300"></a></li>`).join('');
+      section.hidden = false;
+    }
   }
 })();

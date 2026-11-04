@@ -253,16 +253,21 @@ function homeDetail(h) {
   const rules = h.house_rules || {};
   const body = `
 <div class="wrap crumbs"><a href="/#homes">← All homes</a></div>
-<section class="wrap gallery" aria-label="Photos">
-  ${imgs.length ? imgs.slice(0, 5).map((im, i) => `<a class="g${i}" href="${esc(im.url)}" data-photo="${i}"><img src="${esc(i === 0 ? im.url : (im.thumbnail_url || im.url))}" alt="${esc(im.caption || `${o.title} photo ${i + 1}`)}" ${i ? 'loading="lazy"' : 'fetchpriority="high"'}></a>`).join('\n  ') : '<div class="g0 placeholder">Photos coming soon</div>'}
-  ${imgs.length > 5 ? `<button type="button" class="btn-ghost all-photos" data-photo="0">See all ${imgs.length} photos</button>` : ''}
+<section class="wrap gallery" aria-label="Photos" data-gallery>
+  ${galleryTiles(imgs, o.title)}
 </section>
 <div class="wrap detail">
   <article class="detail-main">
     <p class="eyebrow">${esc(town(h))}, Idaho</p>
     <h1>${esc(o.title)}</h1>
     <p class="detail-facts">${esc(facts(h))}${c.beds ? ` · ${plural(c.beds, 'bed', 'beds')}` : ''}</p>
-    <div class="prose">${paragraphs(h.description || h.summary)}</div>
+    ${sleepingRooms(h).length ? `<h2>Where you'll sleep</h2><ul class="beds">${sleepingRooms(h).map((r) => `<li><strong>${esc(r.name)}</strong><span>${esc(r.beds)}</span></li>`).join('')}</ul>` : ''}
+    <h2>About this home</h2>
+    <div class="prose">${h.summary && h.description && !h.description.startsWith(h.summary.slice(0, 40)) ? paragraphs(h.summary) : ''}${paragraphs(h.description || h.summary)}</div>
+    <section class="photos-section" data-photo-section ${imgs.length > 1 ? '' : 'hidden'}>
+      <h2>Photos</h2>
+      <ul class="photo-grid" data-photo-grid>${photoGrid(imgs, o.title)}</ul>
+    </section>
     ${hl.length ? `<h2>What's here</h2><ul class="amenities">${hl.map((a) => `<li>${esc(a)}</li>`).join('')}</ul>` : ''}
     <h2>Good to know</h2>
     <ul class="rules">
@@ -298,7 +303,7 @@ function homeDetail(h) {
   <button type="button" class="lb-nav lb-next" data-lb-next aria-label="Next photo">›</button>
   <p class="lb-count" data-lb-count></p>
 </dialog>
-<script type="application/json" data-photos>${JSON.stringify(imgs.map((i) => i.url)).replace(/</g, '\\u003c')}</script>`;
+<script type="application/json" data-photos>${JSON.stringify(imgs.map((i) => ({ url: i.url, thumb: i.thumbnail_url || i.url, caption: i.caption || '' }))).replace(/</g, '\\u003c')}</script>`;
   return layout({
     title: `${o.title} | ${town(h)} Vacation Rental Near Yellowstone`,
     description: `${o.title} in ${town(h)}, Idaho. ${facts(h)}. ${perk(h) ? perk(h) + '. ' : ''}Check live availability and book direct.`,
@@ -314,6 +319,35 @@ function homeDetail(h) {
       amenityFeature: hl.map((a) => ({ '@type': 'LocationFeatureSpecification', name: a, value: true })),
     },
   });
+}
+
+const BED = { king_bed: ['king bed', 'king beds'], queen_bed: ['queen bed', 'queen beds'], double_bed: ['full bed', 'full beds'],
+  single_bed: ['twin bed', 'twin beds'], bunk_bed: ['bunk bed', 'bunk beds'], sofa_bed: ['sofa bed', 'sofa beds'] };
+const ROOM = { bedroom: 'Bedroom', living_room: 'Living room', game_room: 'Game room', childrens_playroom: 'Playroom',
+  movie_theater: 'Theater room', workspace: 'Office', dining_room: 'Dining room', garage: 'Garage', deck: 'Deck', patio: 'Patio', porch: 'Porch' };
+
+// Rooms with beds, in Hospitable's order: "Bedroom 1: 1 queen bed", "Living room: 1 sofa bed".
+function sleepingRooms(h) {
+  let n = 0;
+  return (h.room_details || []).filter((r) => (r.beds || []).length).map((r) => {
+    const name = r.type === 'bedroom' ? `Bedroom ${++n}` : (ROOM[r.type] || r.type.replace(/_/g, ' ').replace(/^./, (c) => c.toUpperCase()));
+    const beds = r.beds.map((b) => {
+      const [one, many] = BED[b.type] || [b.type.replace(/_/g, ' '), b.type.replace(/_/g, ' ') + 's'];
+      return `${b.quantity} ${b.quantity === 1 ? one : many}`;
+    });
+    return { name, beds: beds.join(', ') };
+  });
+}
+
+function galleryTiles(imgs, title) {
+  if (!imgs.length) return '<div class="g0 placeholder">Photos coming soon</div>';
+  const tiles = imgs.slice(0, 5).map((im, i) => `<a class="g${i}" href="${esc(im.url)}" data-photo="${i}"><img src="${esc(i === 0 ? im.url : (im.thumbnail_url || im.url))}" alt="${esc(im.caption || `${title} photo ${i + 1}`)}" ${i ? 'loading="lazy"' : 'fetchpriority="high"'}></a>`).join('\n  ');
+  const more = imgs.length > 1 ? `<button type="button" class="btn-ghost all-photos" data-photo="0">See all ${imgs.length} photos</button>` : '';
+  return tiles + more;
+}
+
+function photoGrid(imgs, title) {
+  return imgs.map((im, i) => `<li><a href="${esc(im.url)}" data-photo="${i}"><img src="${esc(im.thumbnail_url || im.url)}" alt="${esc(im.caption || `${title} photo ${i + 1}`)}" loading="lazy" width="400" height="300"></a></li>`).join('');
 }
 
 function fmtTime(t) {

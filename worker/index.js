@@ -2,11 +2,13 @@
 import * as search from '../functions/api/search.js';
 import * as calendar from '../functions/api/calendar.js';
 import * as quote from '../functions/api/quote.js';
+import * as photos from '../functions/api/photos.js';
 
 const routes = {
   '/api/search': { GET: search.onRequestGet },
   '/api/calendar': { GET: calendar.onRequestGet },
   '/api/quote': { POST: quote.onRequestPost },
+  '/api/photos': { GET: photos.onRequestGet },
 };
 
 export default {
