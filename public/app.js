@@ -385,7 +385,7 @@
     const img = dlg.querySelector('[data-lb-img]');
     const countEl = dlg.querySelector('[data-lb-count]');
     let i = 0;
-    const show = () => { img.src = photos[i].url; img.alt = photos[i].caption || `Photo ${i + 1} of ${photos.length}`; countEl.textContent = `${i + 1} / ${photos.length}`; };
+    const show = () => { if (photos[i].srcset) { img.srcset = photos[i].srcset; img.sizes = '100vw'; } else img.removeAttribute('srcset'); img.src = photos[i].url; img.alt = photos[i].caption || `Photo ${i + 1} of ${photos.length}`; countEl.textContent = `${i + 1} / ${photos.length}`; };
     document.addEventListener('click', (e) => {
       const el = e.target.closest('[data-photo]');
       if (!el) return;

@@ -332,7 +332,7 @@ function homeDetail(h) {
   <button type="button" class="lb-nav lb-next" data-lb-next aria-label="Next photo">›</button>
   <p class="lb-count" data-lb-count></p>
 </dialog>
-<script type="application/json" data-photos>${JSON.stringify(imgs.map((i) => ({ url: i.url, thumb: i.thumbnail_url || i.url, caption: i.caption || '' }))).replace(/</g, '\\u003c')}</script>`;
+<script type="application/json" data-photos>${JSON.stringify(imgs.map((i) => ({ url: i.url, thumb: i.thumbnail_url || i.url, srcset: i.srcset || '', caption: i.caption || '' }))).replace(/</g, '\\u003c')}</script>`;
   return layout({
     title: `${o.title} | ${town(h)} Vacation Rental Near Yellowstone`,
     description: `${o.title} in ${place(h)}. ${facts(h)}. ${perk(h) ? perk(h) + '. ' : ''}Check live availability and book direct.`,
@@ -372,7 +372,7 @@ function sleepingRooms(h) {
 
 function galleryTiles(imgs, title) {
   if (!imgs.length) return '<div class="g0 placeholder">Photos coming soon</div>';
-  const tiles = imgs.slice(0, 5).map((im, i) => `<a class="g${i}" href="${esc(im.url)}" data-photo="${i}"><img src="${esc(i === 0 ? im.url : (im.thumbnail_url || im.url))}" alt="${esc(im.caption || `${title} photo ${i + 1}`)}" ${i ? 'loading="lazy"' : 'fetchpriority="high"'}></a>`).join('\n  ');
+  const tiles = imgs.slice(0, 5).map((im, i) => `<a class="g${i}" href="${esc(im.url)}" data-photo="${i}"><img src="${esc(i === 0 ? im.url : (im.thumbnail_url || im.url))}"${im.srcset ? ` srcset="${esc(im.srcset)}" sizes="${i === 0 ? '(min-width: 860px) 50vw, 100vw' : '25vw'}"` : ''} alt="${esc(im.caption || `${title} photo ${i + 1}`)}" ${i ? 'loading="lazy"' : 'fetchpriority="high"'}></a>`).join('\n  ');
   const more = imgs.length > 1 ? `<button type="button" class="btn-ghost all-photos" data-photo="0">See all ${imgs.length} photos</button>` : '';
   return tiles + more;
 }
@@ -399,6 +399,19 @@ function notFound() {
 // ---------- write ----------
 
 const all = await loadHomes();
+// Full-resolution photos copied from each home's Airbnb listing (data/airbnb-photos.json, keyed by Hospitable id).
+// Hospitable's own copies are small, so these replace them when present. Airbnb's image server resizes with ?im_w=.
+const AIRBNB = JSON.parse(await readFile(path.join(ROOT, 'data/airbnb-photos.json'), 'utf8').catch(() => '{}'));
+const sized = (u, w) => `${u}?im_w=${w}`;
+for (const h of all) {
+  const list = AIRBNB[h.id]?.photos;
+  if (Array.isArray(list) && list.length) {
+    h.images = list.filter((p) => /^https:\/\/a0\.muscache\.com\/im\/pictures\//.test(p.url)).map((p) => ({
+      url: sized(p.url, 1920), thumbnail_url: sized(p.url, 720), caption: p.caption || '',
+      srcset: [720, 1200, 1920].map((w) => `${sized(p.url, w)} ${w}w`).join(', '),
+    }));
+  }
+}
 // A home added in Hospitable later still gets a page, with a title and URL made from its public name.
 for (const h of all) {
   if (!OVERRIDES[h.id]) {
