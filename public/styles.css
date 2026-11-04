@@ -207,7 +207,7 @@ a[href^="tel:"] { white-space: nowrap; }
 .crumbs span { color: var(--ink-3); margin: 0 6px; }
 .eyebrow a { color: inherit; text-decoration: none; }
 .eyebrow a:hover { text-decoration: underline; }
-.detail-rating { margin: 4px 0 0; font-weight: 600; }
+.detail-rating { margin: 6px 0 20px; font-weight: 600; }
 .detail-rating span { color: #C98A1B; }
 .town-head { padding-top: 8px; display: grid; gap: 12px; }
 .town-head .lede { color: var(--ink-2); max-width: 720px; }
