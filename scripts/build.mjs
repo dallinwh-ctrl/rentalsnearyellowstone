@@ -9,6 +9,7 @@ import { createHash } from 'node:crypto';
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const DIST = path.join(ROOT, 'dist');
 const SITE = JSON.parse(await readFile(path.join(ROOT, 'data/site.json'), 'utf8'));
+const TOWNS = JSON.parse(await readFile(path.join(ROOT, 'data/towns.json'), 'utf8'));
 const OVERRIDES = JSON.parse(await readFile(path.join(ROOT, 'data/overrides.json'), 'utf8'));
 const API = 'https://public.api.hospitable.com/v2';
 const TOKEN = process.env.HOSPITABLE_TOKEN;
@@ -22,6 +23,19 @@ async function api(p) {
   const res = await fetch(API + p, { headers: { authorization: `Bearer ${TOKEN}`, accept: 'application/json' } });
   if (!res.ok) throw new Error(`Hospitable ${p} -> ${res.status}`);
   return res.json();
+}
+
+// Every review Hospitable has for a home (all pages), for the star rating and the quotes.
+async function allReviews(id) {
+  const data = [];
+  for (let page = 1; page <= 20; page++) {
+    const body = await api(`/properties/${id}/reviews?per_page=100&page=${page}`).catch(() => null);
+    if (!body) break;
+    data.push(...(body.data || []));
+    if (!body.meta || page >= body.meta.last_page) break;
+  }
+  data.sort((a, b) => String(b.reviewed_at).localeCompare(String(a.reviewed_at)));
+  return { data };
 }
 
 async function loadHomes() {
@@ -41,8 +55,10 @@ async function loadHomes() {
     if (!p.listed) continue;
     const [imgs, revs] = await Promise.all([
       api(`/properties/${p.id}/images`).catch(() => ({ data: [] })),
-      api(`/properties/${p.id}/reviews?per_page=30`).catch(() => ({ data: [] })),
+      allReviews(p.id),
     ]);
+    const rated = (revs.data || []).map((r) => Number(r.public?.rating)).filter((n) => n >= 1 && n <= 5);
+    const round2 = (v) => (v == null || v === '' ? null : Math.round(Number(v) * 100) / 100);
     // Only city/state leave this script: never a street address.
     out.push({
       id: p.id, name: p.name, public_name: p.public_name, listed: p.listed, picture: p.picture,
@@ -50,6 +66,9 @@ async function loadHomes() {
       room_details: p.room_details, property_type: p.property_type, room_type: p.room_type,
       checkin: p.checkin, checkout: p.checkout, house_rules: p.house_rules,
       address: { city: p.address?.city, state: p.address?.state },
+      // Rounded to about a kilometer for map/search use; the exact spot is only sent after booking.
+      geo: p.address?.coordinates ? { lat: round2(p.address.coordinates.latitude), lng: round2(p.address.coordinates.longitude) } : null,
+      rating: rated.length ? { value: Math.round((rated.reduce((a, b) => a + b, 0) / rated.length) * 100) / 100, count: rated.length } : null,
       images: (imgs.data || []).sort((a, b) => a.order - b.order),
       reviews: (revs.data || []).filter((r) => r.public?.rating >= 5 && (r.public?.review || '').length > 60)
         .slice(0, 6).map((r) => ({ text: r.public.review, platform: r.platform, date: r.reviewed_at })),
@@ -67,6 +86,9 @@ const STATES = { ID: 'Idaho', MT: 'Montana', WY: 'Wyoming' };
 const stateCode = (h) => (STATES[h.address?.state] ? h.address.state : 'ID');
 const state = (h) => STATES[stateCode(h)];
 const place = (h) => `${town(h)}, ${state(h)}`;
+const townPage = (h) => TOWNS.find((t) => t.towns.includes(town(h)));
+const KIND = { cabin: 'Cabin', apartment: 'Suite', house: 'Vacation Home' };
+const kind = (h) => KIND[h.property_type] || 'Vacation Rental';
 // Listing text sometimes shouts ("MINIMAL CELL SERVICE"); show runs of capitals in sentence case without changing the words.
 const unshout = (s) => s.replace(/\b[A-Z]{3,}(?:[ \t]+[A-Z]{2,})+\b/g, (m, i) => {
   const low = m.toLowerCase();
@@ -135,7 +157,7 @@ function paragraphs(text) {
   return out.join('\n');
 }
 
-const LOGO = `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l-6 9h4l-4 6h12l-4-6h4z"/><path d="M12 18v3"/></svg>`;
+const LOGO = `<svg width="30" height="30" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="currentColor"/><path d="M32 8 17 28h8l-12 16h14l-9 10h28l-9-10h14L39 28h8z" fill="#fff"/><rect x="29" y="54" width="6" height="5" rx="1" fill="#E7B65C"/></svg>`;
 
 function layout({ title, description, canonical, image, body, jsonld, bodyClass = '' }) {
   const url = SITE.url + canonical;
@@ -143,22 +165,31 @@ function layout({ title, description, canonical, image, body, jsonld, bodyClass 
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<script>document.documentElement.classList.add('js')</script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(description)}">
 <link rel="canonical" href="${esc(url)}">
 <meta property="og:type" content="website">
+<meta property="og:site_name" content="${esc(SITE.name)}">
+<meta property="og:locale" content="en_US">
 <meta property="og:title" content="${esc(title)}">
 <meta property="og:description" content="${esc(description)}">
 <meta property="og:url" content="${esc(url)}">
 ${image ? `<meta property="og:image" content="${esc(image)}">` : ''}
 <meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.ico" sizes="32x32">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="theme-color" content="#1F4D3A">
+<link rel="preconnect" href="https://a0.muscache.com">
+<link rel="preconnect" href="https://assets.hospitable.com">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/styles.css?v=${V.css}">
-${jsonld ? `<script type="application/ld+json">${JSON.stringify(jsonld).replace(/</g, '\\u003c')}</script>` : ''}
+${[].concat(jsonld || []).map((j) => `<script type="application/ld+json">${JSON.stringify(j).replace(/</g, '\\u003c')}</script>`).join('\n')}
 </head>
 <body class="${bodyClass}">
 <a class="skip" href="#main">Skip to content</a>
@@ -184,6 +215,10 @@ ${body}
     <div>
       <p>Homes cared for by ${esc(SITE.manager_name)}.</p>
       <p><a href="${esc(SITE.manager_owner_url)}">Own a cabin near Yellowstone? See our management →</a></p>
+    </div>
+    <div>
+      <p class="footer-brand">Where to stay</p>
+      <ul class="footer-links">${TOWNS.map((t) => `<li><a href="/${t.slug}/">${esc(t.name)}</a></li>`).join('')}</ul>
     </div>
   </div>
 </footer>
@@ -252,6 +287,14 @@ function homePage(homes) {
   </ul>
   <p class="empty" data-empty hidden>No homes match. Try other dates or towns, or text us at <a href="tel:${esc(SITE.phone_e164)}">${esc(SITE.phone)}</a>.</p>
 </section>
+<section class="wrap section" id="towns">
+  <h2>Where to stay near Yellowstone</h2>
+  <ul class="town-links">${TOWNS.filter((t) => homes.some((h) => townPage(h) === t)).map((t) => {
+    const n = homes.filter((h) => townPage(h) === t).length;
+    const img = homes.find((h) => townPage(h) === t)?.images?.[0];
+    return `<li class="reveal"><a href="/${t.slug}/">${img ? `<img src="${esc(img.thumbnail_url || img.url)}" alt="" loading="lazy" width="600" height="400">` : ''}<span class="town-name">${esc(t.name)}</span><span class="town-count">${plural(n, 'home', 'homes')}</span></a></li>`;
+  }).join('')}</ul>
+</section>
 <section class="wrap section" id="why">
   <div class="why">
     <div><h3>Book with the people on the ground</h3><p>A locally owned team cleans and checks every home, and answers your questions before and during your stay.</p></div>
@@ -260,36 +303,88 @@ function homePage(homes) {
   </div>
 </section>`;
   return layout({
-    title: `${SITE.name} | Cabins and Vacation Homes Near Yellowstone`,
+    title: `Cabin Rentals Near Yellowstone | Island Park & West Yellowstone Homes`,
     description: `Book cabins and vacation homes near Yellowstone direct: Island Park, West Yellowstone, Ashton and nearby. Live availability and prices.`,
     canonical: '/',
     image: homes[0]?.images?.[0]?.url,
     body,
-    jsonld: {
-      '@context': 'https://schema.org', '@type': 'LodgingBusiness', name: SITE.name, url: SITE.url,
-      telephone: SITE.phone, email: SITE.email,
+    jsonld: [{
+      '@context': 'https://schema.org', '@type': 'LodgingBusiness', '@id': `${SITE.url}/#business`, name: SITE.name, url: SITE.url,
+      telephone: SITE.phone, email: SITE.email, logo: `${SITE.url}/icon-512.png`, image: homes[0]?.images?.[0]?.url,
+      parentOrganization: { '@type': 'Organization', name: SITE.manager_name, url: 'https://www.freshpineservices.com/' },
       areaServed: places.map((t) => ({ '@type': 'City', name: t })),
-    },
+    }, {
+      '@context': 'https://schema.org', '@type': 'WebSite', name: SITE.name, url: SITE.url, publisher: { '@id': `${SITE.url}/#business` },
+    }, {
+      '@context': 'https://schema.org', '@type': 'ItemList', name: 'Our homes near Yellowstone',
+      itemListElement: homes.map((h, i) => ({ '@type': 'ListItem', position: i + 1, url: `${SITE.url}/homes/${OVERRIDES[h.id].slug}/`, name: OVERRIDES[h.id].title })),
+    }],
   });
 }
 
-function homeDetail(h) {
+function townDetail(t, homes) {
+  const list = homes.filter((h) => townPage(h) === t);
+  const label = t.name.split(',')[0];
+  const body = `
+<nav class="wrap crumbs" aria-label="Breadcrumb"><a href="/#homes">← All homes</a></nav>
+<section class="wrap town-head reveal">
+  <p class="eyebrow">${esc(t.name)}</p>
+  <h1>${esc(t.h1)}</h1>
+  ${t.intro.map((x) => `<p class="lede">${esc(x)}</p>`).join('\n  ')}
+</section>
+<section class="wrap section" id="homes">
+  <h2>${list.length === 1 ? `Our home in ${esc(label)}` : `Our homes in ${esc(label)}`}</h2>
+  <ul class="grid">${list.map(card).join('\n')}</ul>
+</section>
+<section class="wrap section">
+  <h2>Near ${esc(label)}</h2>
+  <ul class="nearby">${t.nearby.map(([n, d]) => `<li class="reveal"><h3>${esc(n)}</h3><p>${esc(d)}</p></li>`).join('')}</ul>
+</section>
+<section class="wrap section faq">
+  <h2>Questions</h2>
+  ${t.faq.map(([q, a]) => `<details class="reveal"><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join('\n  ')}
+  <p class="other-towns">Also see: ${TOWNS.filter((x) => x !== t).map((x) => `<a href="/${x.slug}/">${esc(x.name)}</a>`).join(' · ')}</p>
+</section>`;
+  return layout({
+    title: t.title, description: t.description, canonical: `/${t.slug}/`,
+    image: list[0]?.images?.[0]?.url, body,
+    jsonld: [
+      { '@context': 'https://schema.org', '@type': 'ItemList', name: t.h1,
+        itemListElement: list.map((h, i) => ({ '@type': 'ListItem', position: i + 1, url: `${SITE.url}/homes/${OVERRIDES[h.id].slug}/`, name: OVERRIDES[h.id].title })) },
+      { '@context': 'https://schema.org', '@type': 'FAQPage',
+        mainEntity: t.faq.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) },
+      breadcrumbs([['Homes', '/'], [t.name, `/${t.slug}/`]]),
+    ],
+  });
+}
+
+function breadcrumbs(items) {
+  return { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
+    itemListElement: items.map(([name, u], i) => ({ '@type': 'ListItem', position: i + 1, name, item: SITE.url + u })) };
+}
+
+function homeDetail(h, homes = []) {
   const o = OVERRIDES[h.id];
   const imgs = h.images || [];
   const hl = highlights(h);
   const c = h.capacity || {};
   const reviews = h.reviews || [];
   const rules = h.house_rules || {};
+  const tp = townPage(h);
+  const r = h.rating && h.rating.count >= 3 ? h.rating : null;
+  const nearby = homes.filter((x) => x.id !== h.id && townPage(x) === tp).slice(0, 3);
+  const bedsText = sleepingRooms(h).map((x) => x.beds).join(', ');
   const body = `
-<div class="wrap crumbs"><a href="/#homes">← All homes</a></div>
+<nav class="wrap crumbs" aria-label="Breadcrumb"><a href="/#homes">← All homes</a>${tp ? ` <span aria-hidden="true">/</span> <a href="/${tp.slug}/">${esc(tp.name.split(',')[0])}</a>` : ''}</nav>
 <section class="wrap gallery n${Math.min(imgs.length, 5) || 1}" aria-label="Photos" data-gallery>
   ${galleryTiles(imgs, o.title)}
 </section>
 <div class="wrap detail">
   <article class="detail-main">
-    <p class="eyebrow">${esc(place(h))}</p>
+    <p class="eyebrow">${tp ? `<a href="/${tp.slug}/">${esc(place(h))}</a>` : esc(place(h))}</p>
     <h1>${esc(o.title)}</h1>
     <p class="detail-facts">${esc(facts(h))}${c.beds ? ` · ${plural(c.beds, 'bed', 'beds')}` : ''}</p>
+    ${r ? `<p class="detail-rating"><span aria-hidden="true">★</span> ${r.value.toFixed(2)} from ${plural(r.count, 'guest review', 'guest reviews')}</p>` : ''}
     ${sleepingRooms(h).length ? `<h2>Where you'll sleep</h2><ul class="beds">${sleepingRooms(h).map((r) => `<li><strong>${esc(r.name)}<span class="sr-sep">: </span></strong><span>${esc(r.beds)}</span></li>`).join('')}</ul>` : ''}
     <h2>About this home</h2>
     <div class="prose">${h.summary && h.description && !h.description.startsWith(h.summary.slice(0, 40)) ? paragraphs(h.summary) : ''}${paragraphs(h.description || h.summary)}</div>
@@ -307,6 +402,7 @@ function homeDetail(h) {
       <li>Exact address sent after booking</li>
     </ul>
     ${reviews.length ? `<h2>What guests say</h2><ul class="reviews">${reviews.slice(0, 4).map((r) => `<li><blockquote>${esc(r.text)}</blockquote><p class="review-meta">Guest review on ${esc(r.platform === 'vrbo' ? 'VRBO' : r.platform === 'airbnb' ? 'Airbnb' : 'our site')}${r.date ? `, ${esc(new Date(r.date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }))}` : ''}</p></li>`).join('')}</ul>` : ''}
+    ${nearby.length ? `<h2>More homes in ${esc(tp.name.split(',')[0])}</h2><ul class="grid grid-small">${nearby.map(card).join('\n')}</ul><p><a href="/${tp.slug}/">See all ${esc(tp.name.split(',')[0])} rentals →</a></p>` : ''}
   </article>
   <aside class="book" id="book" data-book data-id="${esc(h.id)}" data-max="${c.max || 1}" data-pets="${rules.pets_allowed ? '1' : '0'}">
     <div class="book-dates">
@@ -334,19 +430,32 @@ function homeDetail(h) {
 </dialog>
 <script type="application/json" data-photos>${JSON.stringify(imgs.map((i) => ({ url: i.url, thumb: i.thumbnail_url || i.url, srcset: i.srcset || '', caption: i.caption || '' }))).replace(/</g, '\\u003c')}</script>`;
   return layout({
-    title: `${o.title} | ${town(h)} Vacation Rental Near Yellowstone`,
-    description: `${o.title} in ${place(h)}. ${facts(h)}. ${perk(h) ? perk(h) + '. ' : ''}Check live availability and book direct.`,
+    title: `${o.title} | ${town(h)}, ${stateCode(h)} ${kind(h)} Rental Near Yellowstone`,
+    description: `${c.bedrooms ? `${c.bedrooms}-bedroom ` : ''}${kind(h).toLowerCase()} in ${place(h)}, sleeps ${c.max}${perk(h) ? `, ${perk(h).toLowerCase()}` : ''}${r ? `, rated ${r.value.toFixed(2)}★` : ''}. Near Yellowstone. See live prices and book direct with the local team.`,
     canonical: `/homes/${o.slug}/`,
     image: imgs[0]?.url,
     body,
     bodyClass: 'page-home',
-    jsonld: {
+    jsonld: [{
       '@context': 'https://schema.org', '@type': 'VacationRental', name: o.title, url: `${SITE.url}/homes/${o.slug}/`,
-      image: imgs.slice(0, 8).map((i) => i.url), description: unshout(h.summary || ''),
+      identifier: h.id, additionalType: kind(h) === 'Cabin' ? 'Cabin' : kind(h) === 'Suite' ? 'Apartment' : 'House',
+      image: imgs.slice(0, 12).map((i) => i.url), description: unshout(h.summary || ''),
+      brand: { '@type': 'Brand', name: SITE.name },
       address: { '@type': 'PostalAddress', addressLocality: town(h), addressRegion: stateCode(h), addressCountry: 'US' },
-      containsPlace: { '@type': 'Accommodation', occupancy: { '@type': 'QuantitativeValue', maxValue: c.max }, numberOfBedrooms: c.bedrooms, numberOfBathroomsTotal: c.bathrooms },
-      amenityFeature: hl.map((a) => ({ '@type': 'LocationFeatureSpecification', name: a, value: true })),
-    },
+      ...(h.geo?.lat ? { latitude: h.geo.lat, longitude: h.geo.lng } : {}),
+      checkinTime: `${(o.checkin || SITE.checkin || h.checkin)}:00`, checkoutTime: `${(o.checkout || SITE.checkout || h.checkout)}:00`,
+      knowsLanguage: 'en',
+      containsPlace: {
+        '@type': 'Accommodation', additionalType: 'EntirePlace',
+        occupancy: { '@type': 'QuantitativeValue', value: c.max },
+        numberOfBedrooms: c.bedrooms, numberOfBathroomsTotal: c.bathrooms, numberOfRooms: c.bedrooms,
+        ...(bedsText ? { bed: sleepingRooms(h).flatMap((x) => x.beds.split(', ')).map((b) => {
+          const m = b.match(/^(\d+) (.+?)s?$/); return { '@type': 'BedDetails', numberOfBeds: Number(m?.[1] || 1), typeOfBed: m?.[2] || b };
+        }) } : {}),
+        amenityFeature: hl.map((a) => ({ '@type': 'LocationFeatureSpecification', name: a, value: true })),
+      },
+      ...(r ? { aggregateRating: { '@type': 'AggregateRating', ratingValue: r.value, ratingCount: r.count, bestRating: 5 } } : {}),
+    }, breadcrumbs([['Homes', '/'], ...(tp ? [[tp.name, `/${tp.slug}/`]] : []), [o.title, `/homes/${o.slug}/`]])],
   });
 }
 
@@ -433,13 +542,23 @@ await writeFile(path.join(DIST, '404.html'), notFound());
 for (const h of homes) {
   const dir = path.join(DIST, 'homes', OVERRIDES[h.id].slug);
   await mkdir(dir, { recursive: true });
-  await writeFile(path.join(dir, 'index.html'), homeDetail(h));
+  await writeFile(path.join(dir, 'index.html'), homeDetail(h, homes));
+}
+const liveTowns = TOWNS.filter((t) => homes.some((h) => townPage(h) === t));
+for (const t of liveTowns) {
+  await mkdir(path.join(DIST, t.slug), { recursive: true });
+  await writeFile(path.join(DIST, t.slug, 'index.html'), townDetail(t, homes));
 }
 const today = new Date().toISOString().slice(0, 10);
-const urls = ['/', ...homes.map((h) => `/homes/${OVERRIDES[h.id].slug}/`)];
+const xml = (v) => esc(v);
+const entries = [
+  { u: '/', imgs: homes.map((h) => h.images?.[0]).filter(Boolean), pr: '1.0' },
+  ...liveTowns.map((t) => ({ u: `/${t.slug}/`, imgs: homes.filter((h) => townPage(h) === t).map((h) => h.images?.[0]).filter(Boolean), pr: '0.9' })),
+  ...homes.map((h) => ({ u: `/homes/${OVERRIDES[h.id].slug}/`, imgs: h.images || [], pr: '0.8' })),
+];
 await writeFile(path.join(DIST, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urls.map((u) => `  <url><loc>${SITE.url}${u}</loc><lastmod>${today}</lastmod></url>`).join('\n')}
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+${entries.map((e) => `  <url><loc>${SITE.url}${e.u}</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>${e.pr}</priority>${e.imgs.slice(0, 50).map((i) => `<image:image><image:loc>${xml(i.url)}</image:loc></image:image>`).join('')}</url>`).join('\n')}
 </urlset>
 `);
 await writeFile(path.join(DIST, 'robots.txt'), `User-agent: *\nAllow: /\nDisallow: /api/\nSitemap: ${SITE.url}/sitemap.xml\n`);

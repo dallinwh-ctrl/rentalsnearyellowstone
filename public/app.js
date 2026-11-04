@@ -1,6 +1,27 @@
 (() => {
   'use strict';
 
+  // ---------- scroll reveal: cards and sections fade up as they come into view ----------
+  (function reveal() {
+    const els = document.querySelectorAll('.reveal, .grid > .card');
+    if (!('IntersectionObserver' in window) || matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      els.forEach((el) => el.classList.add('in'));
+      return;
+    }
+    const io = new IntersectionObserver((entries) => {
+      let n = 0;
+      for (const e of entries) {
+        if (!e.isIntersecting) continue;
+        e.target.style.setProperty('--d', `${Math.min(n++, 5) * 70}ms`);
+        e.target.classList.add('in');
+        io.unobserve(e.target);
+      }
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+    els.forEach((el) => io.observe(el));
+    // Printing shows everything.
+    addEventListener('beforeprint', () => els.forEach((el) => el.classList.add('in')));
+  })();
+
   // ---------- date helpers (all dates are YYYY-MM-DD strings, handled in UTC) ----------
   const pad = (n) => String(n).padStart(2, '0');
   const ymd = (d) => `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}`;

@@ -1,0 +1,75 @@
+[
+  {
+    "slug": "island-park",
+    "towns": ["Island Park"],
+    "name": "Island Park, Idaho",
+    "h1": "Island Park cabin rentals near Yellowstone",
+    "title": "Island Park Cabin Rentals Near Yellowstone | Book Direct",
+    "description": "Cabins and vacation homes for rent in Island Park, Idaho, a short drive from Yellowstone's West Entrance. Hot tubs, lake homes and big family cabins. Live prices, book direct.",
+    "intro": [
+      "Island Park sits in the pines of the Caribou-Targhee National Forest along Highway 20, just southwest of Yellowstone's West Entrance. Most of our homes are here, from small cabins for two to large family lodges with hot tubs and game rooms.",
+      "Staying in Island Park gives you quiet forest nights and room to spread out, with West Yellowstone and the park entrance close enough for an early start."
+    ],
+    "nearby": [
+      ["Yellowstone National Park", "The West Entrance at West Yellowstone, Montana, is the closest way in from Island Park."],
+      ["Henrys Lake and Island Park Reservoir", "Fishing, boating and paddling, with lake access from some of our homes."],
+      ["Henry's Fork of the Snake River", "One of the best-known fly fishing rivers in the West runs right through Island Park."],
+      ["Harriman State Park", "Trails, wildlife and river views on the Henry's Fork, with cross-country skiing in winter."],
+      ["Mesa Falls", "Upper and Lower Mesa Falls on the Mesa Falls Scenic Byway, south of Island Park."],
+      ["Winter trails", "Island Park is a well-known snowmobiling area, with groomed trails through the forest."]
+    ],
+    "faq": [
+      ["How far is Island Park from Yellowstone?", "Island Park stretches for miles along Highway 20, so it depends on the home. Many guests reach the West Entrance in about 20 to 45 minutes. Each home's page lists its town, and we're happy to tell you the drive time for a specific home."],
+      ["Are there cabins with hot tubs in Island Park?", "Yes. Several of our Island Park homes have a hot tub, and a few have a sauna too. Look for \"Hot tub\" on the home cards."],
+      ["Can I book an Island Park cabin direct?", "Yes. Pick your dates on any home to see the full price with cleaning and taxes, then book on our secure checkout. You can also call or text us first."]
+    ]
+  },
+  {
+    "slug": "west-yellowstone",
+    "towns": ["West Yellowstone"],
+    "name": "West Yellowstone, Montana",
+    "h1": "West Yellowstone vacation rentals",
+    "title": "West Yellowstone Vacation Rentals | Suites and Homes, Book Direct",
+    "description": "Vacation rentals in West Yellowstone, Montana, the town at Yellowstone's West Entrance. Suites and homes for couples and families. Live prices, book direct.",
+    "intro": [
+      "West Yellowstone is the town at Yellowstone's West Entrance, so the park is minutes away. Our West Yellowstone stays are suites and smaller homes, a good fit for couples and small families who want to be close to the gate and to town.",
+      "Restaurants, shops and tour outfitters are close by, and in winter West Yellowstone is a starting point for snowcoach and snowmobile tours into the park."
+    ],
+    "nearby": [
+      ["Yellowstone's West Entrance", "The entrance is at the edge of town, on the road to Madison Junction and Old Faithful."],
+      ["Madison River", "Fishing and wildlife viewing along the river inside and outside the park."],
+      ["Hebgen Lake", "Boating and fishing a short drive northwest of town."],
+      ["Grizzly & Wolf Discovery Center", "A popular stop in town, especially with kids."],
+      ["Rendezvous Ski Trails", "Cross-country ski and bike trails at the south edge of town."],
+      ["Winter park tours", "Guided snowcoach and snowmobile tours into Yellowstone leave from West Yellowstone in winter."]
+    ],
+    "faq": [
+      ["Is West Yellowstone in Montana or Idaho?", "West Yellowstone is in Montana, right at the park's West Entrance. Island Park, where many of our other homes are, is just across the line in Idaho."],
+      ["How close are these rentals to Yellowstone?", "They're in or near the town of West Yellowstone, a short drive from the West Entrance."],
+      ["Can I book a West Yellowstone rental direct?", "Yes. Pick your dates on any home to see the full price with cleaning and taxes, then book on our secure checkout."]
+    ]
+  },
+  {
+    "slug": "ashton-st-anthony-newdale",
+    "towns": ["Ashton", "St. Anthony", "Newdale"],
+    "name": "Ashton, St. Anthony and Newdale, Idaho",
+    "h1": "Ashton, St. Anthony and Newdale vacation rentals",
+    "title": "Ashton, St. Anthony & Newdale Idaho Vacation Rentals | Book Direct",
+    "description": "Vacation rentals in Ashton, St. Anthony and Newdale, Idaho, between Yellowstone and the Tetons. Homes and suites for families and groups. Live prices, book direct.",
+    "intro": [
+      "South of Island Park, the farm towns of Ashton, St. Anthony and Newdale give you more space, wide views and a base between Yellowstone and the Teton side of Idaho.",
+      "These homes work well for families and groups who want room to spread out and don't mind a longer drive to the park."
+    ],
+    "nearby": [
+      ["Mesa Falls Scenic Byway", "The byway starts in Ashton and passes Upper and Lower Mesa Falls on the way to Island Park."],
+      ["Cave Falls and the Bechler area", "A road east of Ashton leads to Cave Falls in Yellowstone's quieter southwest corner."],
+      ["Warm River", "A small, shaded river spot near Ashton for picnics, tubing and fishing."],
+      ["St. Anthony Sand Dunes", "Big open dunes near St. Anthony, popular for off-road riding."],
+      ["Henry's Fork", "The river flows south past Ashton and St. Anthony, with fishing access along the way."]
+    ],
+    "faq": [
+      ["How far are these towns from Yellowstone?", "Ashton is roughly an hour's drive from the West Entrance, and St. Anthony and Newdale are a bit farther. Ask us about drive times for a specific home."],
+      ["Can I book direct?", "Yes. Pick your dates on any home to see the full price with cleaning and taxes, then book on our secure checkout. You can also call or text us first."]
+    ]
+  }
+]
