@@ -241,7 +241,7 @@ function card(h) {
   const o = OVERRIDES[h.id] || {};
   const img = h.images?.[0];
   const p = perk(h);
-  return `<li class="card" data-id="${esc(h.id)}" data-town="${esc(town(h))}" data-guests="${h.capacity?.max || 1}">
+  return `<li class="card" data-id="${esc(h.id)}" data-town="${esc(town(h))}" data-guests="${h.directMax || h.capacity?.max || 1}">
   <a href="/homes/${esc(o.slug)}/">
     <div class="card-img">${img ? `<img src="${esc(img.thumbnail_url || img.url)}" alt="${esc(o.title)}" loading="lazy" width="600" height="450">` : ''}</div>
     <div class="card-body">
@@ -431,7 +431,7 @@ function homeDetail(h, homes = []) {
     ${reviews.length ? `<h2>What guests say</h2><ul class="reviews">${reviews.slice(0, 4).map((r) => `<li><blockquote>${esc(r.text)}</blockquote><p class="review-meta">Guest review on ${esc(r.platform === 'vrbo' ? 'VRBO' : r.platform === 'airbnb' ? 'Airbnb' : 'our site')}${r.date ? `, ${esc(new Date(r.date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }))}` : ''}</p></li>`).join('')}</ul>` : ''}
     ${nearby.length ? `<h2>More homes in ${esc(tp.name.split(',')[0])}</h2><ul class="grid grid-small">${nearby.map(card).join('\n')}</ul><p><a href="/${tp.slug}/">See all ${esc(tp.name.split(',')[0])} rentals →</a></p>` : ''}
   </article>
-  <aside class="book" id="book" data-book data-id="${esc(h.id)}" data-max="${c.max || 1}" data-pets="${petsOk(h) ? '1' : '0'}">
+  <aside class="book" id="book" data-book data-id="${esc(h.id)}" data-max="${h.directMax || c.max || 1}" data-pets="${petsOk(h) ? '1' : '0'}">
     <div class="book-dates">
       <button type="button" class="date-btn" data-open-cal="start"><span>Check in</span><strong data-label="start">Add date</strong></button>
       <button type="button" class="date-btn" data-open-cal="end"><span>Check out</span><strong data-label="end">Add date</strong></button>
@@ -444,6 +444,7 @@ function homeDetail(h, homes = []) {
     </div>
     <button type="button" class="btn" data-quote>Check price</button>
     <div class="quote" data-quote-out role="status" aria-live="polite"></div>
+    ${h.directMax && c.max > h.directMax ? `<p class="book-note"><strong>Groups of ${h.directMax + 1}${c.max > h.directMax + 1 ? `–${c.max}` : ''}:</strong> call or text us at <a href="tel:${esc(SITE.phone_e164)}">${esc(SITE.phone)}</a> to book.</p>` : ''}
     <p class="book-note">Questions first? Call or text <a href="tel:${esc(SITE.phone_e164)}">${esc(SITE.phone)}</a>.</p>
   </aside>
 </div>
@@ -543,6 +544,8 @@ const sized = (u, w) => `${u}?im_w=${w}`;
 // Guest counts from Airbnb where it gives an exact number (Airbnb shows "16+" above 16; those keep Hospitable's number).
 for (const h of all) {
   const m = RULES[h.id]?.max_guests;
+  // directMax: Hospitable's own limit, which is what a direct booking accepts.
+  if (h.capacity) h.directMax = h.capacity.max;
   if (m && h.capacity) h.capacity = { ...h.capacity, max: m };
 }
 for (const h of all) {

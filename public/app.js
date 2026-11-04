@@ -344,7 +344,7 @@
       const children = Math.max(0, parseInt(input('children').value, 10) || 0);
       const pets = input('pets') ? Math.max(0, parseInt(input('pets').value, 10) || 0) : 0;
       if (adults + children > max) {
-        out.innerHTML = `<p class="err">This home sleeps ${max}. Try fewer guests or another home.</p>`;
+        out.innerHTML = `<p class="err">Online booking for this home is for up to ${max} guests. For a bigger group, call or text us, or try another home.</p>`;
         return;
       }
       quoteBtn.disabled = true;
