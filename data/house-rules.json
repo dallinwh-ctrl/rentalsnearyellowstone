@@ -1,0 +1,382 @@
+{
+ "ff27a3b0-3e1c-4df4-ae1a-50c7ee17ba61": {
+  "airbnb": "1161919765957051843",
+  "checkin": "16:00",
+  "checkout": "10:00",
+  "pets": false,
+  "smoking": false,
+  "events": false,
+  "quiet": [
+   "22:00",
+   "08:00"
+  ],
+  "access": "smart lock",
+  "extra": [],
+  "before_checkout": [
+   "Strip used sheets from the beds and leave them on top.",
+   "Start a load of laundry.",
+   "Load the dishwasher with used dishes and start it.",
+   "Bag all trash and place it in the outside bin.",
+   "Check for any personal items.",
+   "Ensure doors are securely locked."
+  ]
+ },
+ "12f773af-9593-4f10-b39e-3830e3684b9b": {
+  "airbnb": "1444422311868006442",
+  "checkin": "16:00",
+  "checkout": "11:00",
+  "pets": false,
+  "smoking": false,
+  "events": null,
+  "quiet": [
+   "22:00",
+   "07:00"
+  ],
+  "access": "smart lock",
+  "extra": [
+   "No commercial photography"
+  ],
+  "before_checkout": [
+   "Strip used sheets from the beds and leave them on top.",
+   "Start a load of laundry.",
+   "Clean any used dishes.",
+   "Bag all trash and place it in the outside bin.",
+   "Check for any personal items.",
+   "Ensure doors are securely locked.",
+   "Return Key Card to hallway."
+  ]
+ },
+ "0dcb19ce-2935-4dda-9006-9c9be94cfc3e": {
+  "airbnb": "1466029975887379609",
+  "checkin": "16:00",
+  "checkout": "10:00",
+  "pets": null,
+  "smoking": null,
+  "events": null,
+  "quiet": null,
+  "access": "lockbox",
+  "extra": []
+ },
+ "1c1c6e82-a7b1-4730-ba1f-927360ed9466": {
+  "airbnb": "1466260714713938906",
+  "checkin": "16:00",
+  "checkout": "10:00",
+  "pets": false,
+  "smoking": false,
+  "events": false,
+  "quiet": [
+   "23:00",
+   "08:00"
+  ],
+  "access": "lockbox",
+  "extra": [
+   "No commercial photography"
+  ]
+ },
+ "d3d4ca25-6775-46d4-a055-0bd5d550e086": {
+  "airbnb": "1466729772965490580",
+  "checkin": "16:00",
+  "checkout": "10:00",
+  "pets": false,
+  "smoking": false,
+  "events": false,
+  "quiet": [
+   "22:00",
+   "08:00"
+  ],
+  "access": "lockbox",
+  "extra": [
+   "No commercial photography"
+  ]
+ },
+ "a8fab74d-547d-47fd-8326-f7854c009c2a": {
+  "airbnb": "1476980675839594379",
+  "checkin": "16:00",
+  "checkout": "10:00",
+  "pets": false,
+  "smoking": false,
+  "events": false,
+  "quiet": [
+   "22:00",
+   "08:00"
+  ],
+  "access": "lockbox",
+  "extra": [
+   "No commercial photography"
+  ]
+ },
+ "bb6890ef-a6d4-4f6b-9614-ad19d45041f4": {
+  "airbnb": "1477003811315655890",
+  "checkin": "16:00",
+  "checkout": "10:00",
+  "pets": false,
+  "smoking": false,
+  "events": false,
+  "quiet": [
+   "22:00",
+   "08:00"
+  ],
+  "access": "keypad",
+  "extra": []
+ },
+ "4da54409-c12c-4881-91b2-d017570f05d2": {
+  "airbnb": "1477044136131141329",
+  "checkin": "16:00",
+  "checkout": "10:00",
+  "pets": false,
+  "smoking": false,
+  "events": false,
+  "quiet": [
+   "23:00",
+   "07:00"
+  ],
+  "access": "smart lock",
+  "extra": [
+   "No commercial photography"
+  ]
+ },
+ "0c09a1f7-ce83-4c56-bdb9-88a52f0f8870": {
+  "airbnb": "1559639104853840967",
+  "checkin": "16:00",
+  "checkout": "10:00",
+  "pets": false,
+  "smoking": false,
+  "events": false,
+  "quiet": [
+   "22:00",
+   "08:00"
+  ],
+  "access": "keypad",
+  "extra": [
+   "No commercial photography",
+   "Winter travel notice: 4x4 or AWD vehicles are strongly recommended due to snow-packed and icy roads. Access may be difficult or unsafe for 2WD vehicles."
+  ]
+ },
+ "cb6c1915-781c-41bf-bce2-fbd99d3f08cc": {
+  "airbnb": "1613979023789805724",
+  "checkin": "16:00",
+  "checkout": "10:00",
+  "pets": false,
+  "smoking": false,
+  "events": false,
+  "quiet": [
+   "22:00",
+   "08:00"
+  ],
+  "access": "keypad",
+  "extra": [
+   "No commercial photography"
+  ]
+ },
+ "d47277ba-479b-46dc-876d-ffef96ce7373": {
+  "airbnb": "1625652255708665516",
+  "checkin": "16:00",
+  "checkout": "10:00",
+  "pets": false,
+  "smoking": false,
+  "events": false,
+  "quiet": [
+   "22:00",
+   "08:00"
+  ],
+  "access": "lockbox",
+  "extra": [
+   "No commercial photography"
+  ]
+ },
+ "d48fc422-5d9e-4ced-b13b-d992ebf3e477": {
+  "airbnb": "1665450531276426053",
+  "checkin": "16:00",
+  "checkout": "10:00",
+  "pets": false,
+  "smoking": false,
+  "events": null,
+  "quiet": null,
+  "access": "keypad",
+  "extra": [
+   "No commercial photography"
+  ]
+ },
+ "a6386184-e26a-49ee-8ebc-651f837daaaf": {
+  "airbnb": "1668319118386277510",
+  "checkin": "16:00",
+  "checkout": "10:00",
+  "pets": false,
+  "smoking": false,
+  "events": null,
+  "quiet": null,
+  "access": "keypad",
+  "extra": []
+ },
+ "18394ba6-5ec0-4894-b1e5-642e5ffe951e": {
+  "airbnb": "1670578923244944253",
+  "checkin": "16:00",
+  "checkout": "10:00",
+  "pets": false,
+  "smoking": false,
+  "events": false,
+  "quiet": [
+   "22:00",
+   "08:00"
+  ],
+  "access": "keypad",
+  "extra": []
+ },
+ "5e45a36d-8877-4d1f-94e8-96ab17116a67": {
+  "airbnb": "1671270636218712771",
+  "checkin": "16:00",
+  "checkout": "10:00",
+  "pets": {
+   "max": 1
+  },
+  "smoking": false,
+  "events": false,
+  "quiet": [
+   "22:00",
+   "08:00"
+  ],
+  "access": "keypad",
+  "extra": []
+ },
+ "9a1d2b87-a78f-4394-adde-3812edab80d8": {
+  "airbnb": "1671336541122488555",
+  "checkin": "16:00",
+  "checkout": "10:00",
+  "pets": false,
+  "smoking": false,
+  "events": false,
+  "quiet": [
+   "22:00",
+   "08:00"
+  ],
+  "access": "keypad",
+  "extra": []
+ },
+ "4b73ae9e-cd7e-4e76-ac25-e9f2a89b53d6": {
+  "airbnb": "1701159122712069636",
+  "checkin": "16:00",
+  "checkout": "10:00",
+  "pets": false,
+  "smoking": false,
+  "events": false,
+  "quiet": [
+   "22:00",
+   "08:00"
+  ],
+  "access": "smart lock",
+  "extra": []
+ },
+ "4f400be2-d85c-4fba-be22-2c39992e443e": {
+  "airbnb": "1704785719104882628",
+  "checkin": "16:00",
+  "checkout": "10:00",
+  "pets": false,
+  "smoking": false,
+  "events": false,
+  "quiet": [
+   "22:00",
+   "08:00"
+  ],
+  "access": "keypad",
+  "extra": [
+   "No commercial photography"
+  ]
+ },
+ "972d8770-dc80-4512-b7b8-ced7d60233ba": {
+  "airbnb": "1720558079987234839",
+  "checkin": "16:00",
+  "checkout": "10:00",
+  "pets": false,
+  "smoking": false,
+  "events": false,
+  "quiet": [
+   "22:00",
+   "08:00"
+  ],
+  "access": "smart lock",
+  "extra": [
+   "No commercial photography"
+  ]
+ },
+ "479b9aae-9485-4481-b945-3d199688f497": {
+  "airbnb": "1724308232069857475",
+  "checkin": "16:00",
+  "checkout": "10:00",
+  "pets": false,
+  "smoking": false,
+  "events": false,
+  "quiet": null,
+  "access": "smart lock",
+  "extra": []
+ },
+ "242582b2-f02c-4850-b585-f385ef194b64": {
+  "airbnb": "1725103704935849477",
+  "checkin": "16:00",
+  "checkout": "10:00",
+  "pets": false,
+  "smoking": false,
+  "events": false,
+  "quiet": [
+   "23:00",
+   "07:00"
+  ],
+  "access": "smart lock",
+  "extra": [
+   "No commercial photography"
+  ]
+ },
+ "9a9eb7b0-ee33-4b7b-8603-dbd61a914868": {
+  "airbnb": "1726584088242395442",
+  "checkin": "16:00",
+  "checkout": "10:00",
+  "pets": false,
+  "smoking": false,
+  "events": false,
+  "quiet": [
+   "21:00",
+   "08:00"
+  ],
+  "access": "smart lock",
+  "extra": [
+   "No commercial photography"
+  ]
+ },
+ "f3919294-fb07-4a1e-939e-2c45e1594809": {
+  "airbnb": "1763285534084823245",
+  "checkin": "16:00",
+  "checkout": "10:00",
+  "pets": null,
+  "smoking": null,
+  "events": null,
+  "quiet": null,
+  "access": "keypad",
+  "extra": []
+ },
+ "9a8e7476-f4c3-404e-8654-2beadd5c6156": {
+  "airbnb": "1780638000985292438",
+  "checkin": "16:00",
+  "checkout": "10:00",
+  "pets": false,
+  "smoking": false,
+  "events": false,
+  "quiet": null,
+  "access": "keypad",
+  "extra": [
+   "No commercial photography"
+  ]
+ },
+ "c2145188-45d3-4dbc-b1db-ad3371ad4f91": {
+  "airbnb": "1785828045621612068",
+  "checkin": "16:00",
+  "checkout": "10:00",
+  "pets": null,
+  "smoking": null,
+  "events": null,
+  "quiet": null,
+  "access": "smart lock",
+  "extra": [],
+  "before_checkout": [
+   "Lock up at checkout."
+  ]
+ }
+}

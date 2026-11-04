@@ -10,6 +10,8 @@ const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const DIST = path.join(ROOT, 'dist');
 const SITE = JSON.parse(await readFile(path.join(ROOT, 'data/site.json'), 'utf8'));
 const TOWNS = JSON.parse(await readFile(path.join(ROOT, 'data/towns.json'), 'utf8'));
+// House rules copied from each home's Airbnb listing (keyed by Hospitable id). null means Airbnb has no rule set, so nothing is shown.
+const RULES = JSON.parse(await readFile(path.join(ROOT, 'data/house-rules.json'), 'utf8').catch(() => '{}'));
 const OVERRIDES = JSON.parse(await readFile(path.join(ROOT, 'data/overrides.json'), 'utf8'));
 const API = 'https://public.api.hospitable.com/v2';
 const TOKEN = process.env.HOSPITABLE_TOKEN;
@@ -360,6 +362,30 @@ function townDetail(t, homes) {
   });
 }
 
+const ACCESS = { keypad: 'Self check-in with a keypad', 'smart lock': 'Self check-in with a smart lock', lockbox: 'Self check-in with a lockbox' };
+const timesOf = (h) => {
+  const r = RULES[h.id] || {};
+  return { checkin: r.checkin || OVERRIDES[h.id]?.checkin || SITE.checkin || h.checkin, checkout: r.checkout || OVERRIDES[h.id]?.checkout || SITE.checkout || h.checkout };
+};
+const petsOk = (h) => (RULES[h.id] ? !!RULES[h.id].pets : !!h.house_rules?.pets_allowed);
+
+function houseRules(h) {
+  const r = RULES[h.id] || {};
+  const t = timesOf(h);
+  const items = [
+    `Check in after ${fmtTime(t.checkin)}, check out by ${fmtTime(t.checkout)}`,
+    ACCESS[r.access],
+    r.pets === false ? 'No pets' : r.pets ? `Pets allowed${r.pets.max ? ` (${plural(r.pets.max, 'pet', 'pets')} max)` : ''}` : '',
+    r.smoking === false ? 'No smoking or vaping' : '',
+    r.events === false ? 'No parties or events' : '',
+    r.quiet ? `Quiet hours ${fmtTime(r.quiet[0])} to ${fmtTime(r.quiet[1])}` : '',
+    ...(r.extra || []),
+    'Exact address sent after booking',
+  ].filter(Boolean);
+  return `<ul class="rules">${items.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
+    ${r.before_checkout ? `<h3 class="rules-sub">Before you leave</h3><ul class="rules">${r.before_checkout.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}`;
+}
+
 function breadcrumbs(items) {
   return { '@context': 'https://schema.org', '@type': 'BreadcrumbList',
     itemListElement: items.map(([name, u], i) => ({ '@type': 'ListItem', position: i + 1, name, item: SITE.url + u })) };
@@ -395,18 +421,12 @@ function homeDetail(h, homes = []) {
       <ul class="photo-grid" data-photo-grid>${photoGrid(imgs, o.title)}</ul>
     </section>
     ${hl.length ? `<h2>What's here</h2><ul class="amenities">${hl.map((a) => `<li>${esc(a)}</li>`).join('')}</ul>` : ''}
-    <h2>Good to know</h2>
-    <ul class="rules">
-      <li>Check in after ${esc(fmtTime(o.checkin || SITE.checkin || h.checkin))}, check out by ${esc(fmtTime(o.checkout || SITE.checkout || h.checkout))}</li>
-      ${rules.pets_allowed === false ? '<li>No pets</li>' : rules.pets_allowed ? '<li>Pets welcome (pet fee may apply)</li>' : ''}
-      ${rules.smoking_allowed === false ? '<li>No smoking</li>' : ''}
-      ${rules.events_allowed === false ? '<li>No parties or events</li>' : ''}
-      <li>Exact address sent after booking</li>
-    </ul>
+    <h2>House rules</h2>
+    ${houseRules(h)}
     ${reviews.length ? `<h2>What guests say</h2><ul class="reviews">${reviews.slice(0, 4).map((r) => `<li><blockquote>${esc(r.text)}</blockquote><p class="review-meta">Guest review on ${esc(r.platform === 'vrbo' ? 'VRBO' : r.platform === 'airbnb' ? 'Airbnb' : 'our site')}${r.date ? `, ${esc(new Date(r.date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }))}` : ''}</p></li>`).join('')}</ul>` : ''}
     ${nearby.length ? `<h2>More homes in ${esc(tp.name.split(',')[0])}</h2><ul class="grid grid-small">${nearby.map(card).join('\n')}</ul><p><a href="/${tp.slug}/">See all ${esc(tp.name.split(',')[0])} rentals →</a></p>` : ''}
   </article>
-  <aside class="book" id="book" data-book data-id="${esc(h.id)}" data-max="${c.max || 1}" data-pets="${rules.pets_allowed ? '1' : '0'}">
+  <aside class="book" id="book" data-book data-id="${esc(h.id)}" data-max="${c.max || 1}" data-pets="${petsOk(h) ? '1' : '0'}">
     <div class="book-dates">
       <button type="button" class="date-btn" data-open-cal="start"><span>Check in</span><strong data-label="start">Add date</strong></button>
       <button type="button" class="date-btn" data-open-cal="end"><span>Check out</span><strong data-label="end">Add date</strong></button>
@@ -445,7 +465,7 @@ function homeDetail(h, homes = []) {
       brand: { '@type': 'Brand', name: SITE.name },
       address: { '@type': 'PostalAddress', addressLocality: town(h), addressRegion: stateCode(h), addressCountry: 'US' },
       ...(h.geo?.lat ? { latitude: h.geo.lat, longitude: h.geo.lng } : {}),
-      checkinTime: `${(o.checkin || SITE.checkin || h.checkin)}:00`, checkoutTime: `${(o.checkout || SITE.checkout || h.checkout)}:00`,
+      checkinTime: `${timesOf(h).checkin}:00`, checkoutTime: `${timesOf(h).checkout}:00`,
       knowsLanguage: 'en',
       containsPlace: {
         '@type': 'Accommodation', additionalType: 'EntirePlace',

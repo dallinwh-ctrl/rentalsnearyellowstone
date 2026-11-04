@@ -257,3 +257,4 @@ a[href^="tel:"] { white-space: nowrap; }
 @keyframes pop { 0% { transform: scale(.85); opacity: .4; } 100% { transform: scale(1); opacity: 1; } }
 @media (min-width: 860px) { .footer-row { display: grid; grid-template-columns: 1.6fr 1.2fr 1fr; } }
 #towns h2, .section > h2 { margin-bottom: 16px; }
+.rules-sub { margin: 18px 0 6px; font-size: 17px; }
