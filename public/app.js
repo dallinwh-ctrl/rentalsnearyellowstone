@@ -138,7 +138,7 @@
       });
       countEl.textContent = results
         ? `${shown} home${shown === 1 ? '' : 's'} open for your dates`
-        : `${town ? `${shown} home${shown === 1 ? '' : 's'} in ${town}` : `All ${shown} homes`}`;
+        : (town ? `Our homes in ${town}` : 'Our homes near Yellowstone');
       empty.hidden = shown > 0;
     }
 

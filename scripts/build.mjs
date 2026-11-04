@@ -204,7 +204,7 @@ function homePage(homes) {
   <div class="wrap">
     <p class="kicker">${esc(towns.slice(0, 4).join(' · '))}</p>
     <h1>Cabins and homes near Yellowstone, booked direct with the local team.</h1>
-    <p class="lede">${homes.length} homes for 2 to ${Math.max(...homes.map((h) => h.capacity?.max || 0))} guests. Live prices and calendars, and the people who clean and care for each home answer your messages.</p>
+    <p class="lede">Cabins and lodges for 2 to ${Math.max(...homes.map((h) => h.capacity?.max || 0))} guests. Live prices and calendars, and the people who clean and care for each home answer your messages.</p>
     <p class="proof">${esc(SITE.review_line)}</p>
     ${searchForm()}
     <p class="search-status" data-search-status role="status" aria-live="polite"></p>
@@ -212,7 +212,7 @@ function homePage(homes) {
 </section>
 <section class="wrap section" id="homes">
   <div class="section-head">
-    <h2 data-count>All ${homes.length} homes</h2>
+    <h2 data-count>Our homes near Yellowstone</h2>
     <div class="chips" role="group" aria-label="Filter by town">
       <button type="button" class="chip" aria-pressed="true" data-town="">All towns</button>
       ${towns.map((t) => `<button type="button" class="chip" aria-pressed="false" data-town="${esc(t)}">${esc(t)}</button>`).join('\n      ')}
@@ -232,7 +232,7 @@ function homePage(homes) {
 </section>`;
   return layout({
     title: `${SITE.name} | Cabins and Vacation Homes Near Yellowstone`,
-    description: `Book ${homes.length} cabins and vacation homes near Yellowstone direct: Island Park, West Yellowstone, Ashton and nearby. Live availability and prices.`,
+    description: `Book cabins and vacation homes near Yellowstone direct: Island Park, West Yellowstone, Ashton and nearby. Live availability and prices.`,
     canonical: '/',
     image: homes[0]?.images?.[0]?.url,
     body,
