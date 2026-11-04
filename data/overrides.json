@@ -32,7 +32,8 @@
   "bb6890ef-a6d4-4f6b-9614-ad19d45041f4": {
     "title": "Stillwood Cabin",
     "slug": "stillwood-cabin",
-    "hidden": false
+    "hidden": false,
+    "order": 4
   },
   "4da54409-c12c-4881-91b2-d017570f05d2": {
     "title": "Modern Forest Retreat",
@@ -42,7 +43,8 @@
   "0c09a1f7-ce83-4c56-bdb9-88a52f0f8870": {
     "title": "Lake House Retreat",
     "slug": "lake-house-retreat",
-    "hidden": false
+    "hidden": false,
+    "order": 1
   },
   "cb6c1915-781c-41bf-bce2-fbd99d3f08cc": {
     "title": "Sauna and Hot Tub Cabin",
@@ -57,7 +59,8 @@
   "d48fc422-5d9e-4ced-b13b-d992ebf3e477": {
     "title": "Twin Feathers Cabin",
     "slug": "twin-feathers-cabin",
-    "hidden": false
+    "hidden": false,
+    "order": 2
   },
   "a6386184-e26a-49ee-8ebc-651f837daaaf": {
     "title": "11 Acre, 5 Cabin Retreat",
@@ -92,7 +95,8 @@
   "972d8770-dc80-4512-b7b8-ced7d60233ba": {
     "title": "Ponca Creek Inn",
     "slug": "ponca-creek-inn",
-    "hidden": false
+    "hidden": false,
+    "order": 3
   },
   "479b9aae-9485-4481-b945-3d199688f497": {
     "title": "Teton Suites, Sleeps 16",
