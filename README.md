@@ -1,6 +1,6 @@
 # Rentals Near Yellowstone
 
-Direct booking site for the homes Fresh Pine Services manages, at rentalsnearyellowstone.com.
+Direct booking site for the homes Fresh Pine Property Services manages, at rentalsnearyellowstone.com.
 
 Guests browse the homes, see live availability and prices, and pay on Hospitable's secure checkout.
 Every booking lands in Hospitable like any other direct booking.
