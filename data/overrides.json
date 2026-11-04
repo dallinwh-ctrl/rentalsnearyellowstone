@@ -7,7 +7,8 @@
   "12f773af-9593-4f10-b39e-3830e3684b9b": {
     "title": "Walk to Lake Family Cabin",
     "slug": "walk-to-lake-family-cabin",
-    "hidden": false
+    "hidden": false,
+    "order": 1002
   },
   "0dcb19ce-2935-4dda-9006-9c9be94cfc3e": {
     "title": "Trailside Yellowstone Suite",
@@ -38,7 +39,8 @@
   "4da54409-c12c-4881-91b2-d017570f05d2": {
     "title": "Modern Forest Retreat",
     "slug": "modern-forest-retreat",
-    "hidden": false
+    "hidden": false,
+    "order": 1001
   },
   "0c09a1f7-ce83-4c56-bdb9-88a52f0f8870": {
     "title": "Lake House Retreat",

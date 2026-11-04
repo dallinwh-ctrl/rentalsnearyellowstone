@@ -342,8 +342,8 @@ for (const h of all) {
     console.warn(`New home not in data/overrides.json, using "${title}". Add it there to pick its title and URL.`);
   }
 }
-// Homes with an "order" in data/overrides.json come first (1, 2, 3...), the rest keep Hospitable's order.
-const rank = (h) => OVERRIDES[h.id].order ?? Infinity;
+// "order" in data/overrides.json: low numbers (1, 2, 3...) go first, 1000+ go last, homes without one sit in between in Hospitable's order.
+const rank = (h) => OVERRIDES[h.id].order ?? 500;
 const homes = all.filter((h) => !OVERRIDES[h.id].hidden)
   .map((h, i) => [h, i]).sort((a, b) => rank(a[0]) - rank(b[0]) || a[1] - b[1]).map(([h]) => h);
 await rm(DIST, { recursive: true, force: true });
