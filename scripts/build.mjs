@@ -183,6 +183,8 @@ ${image ? `<meta property="og:image" content="${esc(image)}">` : ''}
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
 <meta name="theme-color" content="#1F4D3A">
+${SITE.google_verification ? `<meta name="google-site-verification" content="${esc(SITE.google_verification)}">` : ''}
+${SITE.bing_verification ? `<meta name="msvalidate.01" content="${esc(SITE.bing_verification)}">` : ''}
 <link rel="preconnect" href="https://a0.muscache.com">
 <link rel="preconnect" href="https://assets.hospitable.com">
 <link rel="preconnect" href="https://fonts.googleapis.com">
