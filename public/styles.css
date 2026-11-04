@@ -187,3 +187,5 @@ input { font: inherit; font-weight: 400; font-size: 16px; padding: 11px 12px; bo
 .beds li { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px; }
 .beds strong { font-size: 15px; }
 .beds span { font-size: 15px; color: var(--ink-2); }
+.beds .sr-sep { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.beds li { position: relative; }

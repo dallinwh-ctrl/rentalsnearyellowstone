@@ -4,6 +4,7 @@
 import { mkdir, readFile, writeFile, rm, cp } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createHash } from 'node:crypto';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const DIST = path.join(ROOT, 'dist');
@@ -11,6 +12,9 @@ const SITE = JSON.parse(await readFile(path.join(ROOT, 'data/site.json'), 'utf8'
 const OVERRIDES = JSON.parse(await readFile(path.join(ROOT, 'data/overrides.json'), 'utf8'));
 const API = 'https://public.api.hospitable.com/v2';
 const TOKEN = process.env.HOSPITABLE_TOKEN;
+// Content hashes so browsers pick up new CSS/JS right after a deploy.
+const hashOf = async (f) => createHash('sha1').update(await readFile(path.join(ROOT, 'public', f))).digest('hex').slice(0, 10);
+const V = { css: await hashOf('styles.css'), js: await hashOf('app.js') };
 
 // ---------- data ----------
 
@@ -129,7 +133,7 @@ ${image ? `<meta property="og:image" content="${esc(image)}">` : ''}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/styles.css?v=${V.css}">
 ${jsonld ? `<script type="application/ld+json">${JSON.stringify(jsonld).replace(/</g, '\\u003c')}</script>` : ''}
 </head>
 <body class="${bodyClass}">
@@ -159,7 +163,7 @@ ${body}
     </div>
   </div>
 </footer>
-<script src="/app.js" defer></script>
+<script src="/app.js?v=${V.js}" defer></script>
 </body>
 </html>
 `;
@@ -261,7 +265,7 @@ function homeDetail(h) {
     <p class="eyebrow">${esc(town(h))}, Idaho</p>
     <h1>${esc(o.title)}</h1>
     <p class="detail-facts">${esc(facts(h))}${c.beds ? ` · ${plural(c.beds, 'bed', 'beds')}` : ''}</p>
-    ${sleepingRooms(h).length ? `<h2>Where you'll sleep</h2><ul class="beds">${sleepingRooms(h).map((r) => `<li><strong>${esc(r.name)}</strong><span>${esc(r.beds)}</span></li>`).join('')}</ul>` : ''}
+    ${sleepingRooms(h).length ? `<h2>Where you'll sleep</h2><ul class="beds">${sleepingRooms(h).map((r) => `<li><strong>${esc(r.name)}<span class="sr-sep">: </span></strong><span>${esc(r.beds)}</span></li>`).join('')}</ul>` : ''}
     <h2>About this home</h2>
     <div class="prose">${h.summary && h.description && !h.description.startsWith(h.summary.slice(0, 40)) ? paragraphs(h.summary) : ''}${paragraphs(h.description || h.summary)}</div>
     <section class="photos-section" data-photo-section ${imgs.length > 1 ? '' : 'hidden'}>
