@@ -204,7 +204,7 @@ function homePage(homes) {
   <div class="wrap">
     <p class="kicker">${esc(towns.slice(0, 4).join(' · '))}</p>
     <h1>Cabins and homes near Yellowstone, booked direct with the local team.</h1>
-    <p class="lede">Cabins and lodges for 2 to ${Math.max(...homes.map((h) => h.capacity?.max || 0))} guests. Live prices and calendars, and the people who clean and care for each home answer your messages.</p>
+    <p class="lede">Cabins and lodges for couples, families and big groups. Live prices and calendars, and the people who clean and care for each home answer your messages.</p>
     <p class="proof">${esc(SITE.review_line)}</p>
     ${searchForm()}
     <p class="search-status" data-search-status role="status" aria-live="polite"></p>
