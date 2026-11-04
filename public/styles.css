@@ -189,3 +189,9 @@ input { font: inherit; font-weight: 400; font-size: 16px; padding: 11px 12px; bo
 .beds span { font-size: 15px; color: var(--ink-2); }
 .beds .sr-sep { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .beds li { position: relative; }
+
+/* listing text */
+.prose h3 { font-family: var(--body); font-size: 17px; font-weight: 600; margin: 22px 0 8px; }
+.prose ul { margin: 0 0 14px; padding-left: 20px; }
+.prose li { margin-bottom: 6px; }
+a[href^="tel:"] { white-space: nowrap; }

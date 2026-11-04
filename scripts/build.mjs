@@ -106,9 +106,23 @@ function facts(h) {
   return parts.join(' · ');
 }
 
+// Listing text -> HTML: blank-line blocks become paragraphs, "-", "•" or "*" lines become bullet lists,
+// a short line ending in ":" or with no period before a list becomes a small heading.
 function paragraphs(text) {
-  return String(text || '').split(/\n{2,}/).map((p) => p.trim()).filter(Boolean)
-    .map((p) => `<p>${esc(p).replace(/\n/g, '<br>')}</p>`).join('\n');
+  const lines = String(text || '').replace(/\r/g, '').split('\n').map((l) => l.replace(/[ \t]+/g, ' ').trim());
+  const out = [];
+  let list = null;
+  const close = () => { if (list) { out.push(`<ul>${list.map((li) => `<li>${esc(li).replace(/^([A-Z][\w &amp;/'’-]{1,30}):\s/, '<strong>$1:</strong> ')}</li>`).join('')}</ul>`); list = null; } };
+  for (const line of lines) {
+    if (!line) { close(); continue; }
+    const bullet = line.match(/^[-•*]\s*(.+)$/);
+    if (bullet) { (list ||= []).push(bullet[1]); continue; }
+    close();
+    if (line.length <= 40 && !/[.!?]$/.test(line)) out.push(`<h3>${esc(line.replace(/:$/, ''))}</h3>`);
+    else out.push(`<p>${esc(line)}</p>`);
+  }
+  close();
+  return out.join('\n');
 }
 
 const LOGO = `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l-6 9h4l-4 6h12l-4-6h4z"/><path d="M12 18v3"/></svg>`;
@@ -208,7 +222,7 @@ function homePage(homes) {
   <div class="wrap">
     <p class="kicker">${esc(towns.slice(0, 4).join(' · '))}</p>
     <h1>Cabins and homes near Yellowstone, booked direct with the local team.</h1>
-    <p class="lede">Cabins and lodges for couples, families and big groups. Live prices and calendars, and the people who clean and care for each home answer your messages.</p>
+    <p class="lede">For couples, families and big groups. Live prices and calendars, and the people who clean and care for each home answer your messages.</p>
     <p class="proof">${esc(SITE.review_line)}</p>
     ${searchForm()}
     <p class="search-status" data-search-status role="status" aria-live="polite"></p>
@@ -303,7 +317,7 @@ function homeDetail(h) {
 <dialog class="lightbox" data-lightbox aria-label="Photos">
   <button type="button" class="lb-close" data-lb-close aria-label="Close photos">×</button>
   <button type="button" class="lb-nav lb-prev" data-lb-prev aria-label="Previous photo">‹</button>
-  <img data-lb-img alt="">
+  <img data-lb-img alt="Enlarged photo">
   <button type="button" class="lb-nav lb-next" data-lb-next aria-label="Next photo">›</button>
   <p class="lb-count" data-lb-count></p>
 </dialog>
