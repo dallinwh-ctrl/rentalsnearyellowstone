@@ -44,7 +44,8 @@
    "Check for any personal items.",
    "Ensure doors are securely locked.",
    "Return Key Card to hallway."
-  ]
+  ],
+  "max_guests": 12
  },
  "0dcb19ce-2935-4dda-9006-9c9be94cfc3e": {
   "airbnb": "1466029975887379609",
@@ -55,7 +56,8 @@
   "events": null,
   "quiet": null,
   "access": "lockbox",
-  "extra": []
+  "extra": [],
+  "max_guests": 2
  },
  "1c1c6e82-a7b1-4730-ba1f-927360ed9466": {
   "airbnb": "1466260714713938906",
@@ -71,7 +73,8 @@
   "access": "lockbox",
   "extra": [
    "No commercial photography"
-  ]
+  ],
+  "max_guests": 2
  },
  "d3d4ca25-6775-46d4-a055-0bd5d550e086": {
   "airbnb": "1466729772965490580",
@@ -87,7 +90,8 @@
   "access": "lockbox",
   "extra": [
    "No commercial photography"
-  ]
+  ],
+  "max_guests": 2
  },
  "a8fab74d-547d-47fd-8326-f7854c009c2a": {
   "airbnb": "1476980675839594379",
@@ -103,7 +107,8 @@
   "access": "lockbox",
   "extra": [
    "No commercial photography"
-  ]
+  ],
+  "max_guests": 2
  },
  "bb6890ef-a6d4-4f6b-9614-ad19d45041f4": {
   "airbnb": "1477003811315655890",
@@ -117,7 +122,8 @@
    "08:00"
   ],
   "access": "keypad",
-  "extra": []
+  "extra": [],
+  "max_guests": 10
  },
  "4da54409-c12c-4881-91b2-d017570f05d2": {
   "airbnb": "1477044136131141329",
@@ -150,7 +156,8 @@
   "extra": [
    "No commercial photography",
    "Winter travel notice: 4x4 or AWD vehicles are strongly recommended due to snow-packed and icy roads. Access may be difficult or unsafe for 2WD vehicles."
-  ]
+  ],
+  "max_guests": 10
  },
  "cb6c1915-781c-41bf-bce2-fbd99d3f08cc": {
   "airbnb": "1613979023789805724",
@@ -166,7 +173,8 @@
   "access": "keypad",
   "extra": [
    "No commercial photography"
-  ]
+  ],
+  "max_guests": 8
  },
  "d47277ba-479b-46dc-876d-ffef96ce7373": {
   "airbnb": "1625652255708665516",
@@ -182,7 +190,8 @@
   "access": "lockbox",
   "extra": [
    "No commercial photography"
-  ]
+  ],
+  "max_guests": 2
  },
  "d48fc422-5d9e-4ced-b13b-d992ebf3e477": {
   "airbnb": "1665450531276426053",
@@ -195,7 +204,8 @@
   "access": "keypad",
   "extra": [
    "No commercial photography"
-  ]
+  ],
+  "max_guests": 9
  },
  "a6386184-e26a-49ee-8ebc-651f837daaaf": {
   "airbnb": "1668319118386277510",
@@ -236,7 +246,8 @@
    "08:00"
   ],
   "access": "keypad",
-  "extra": []
+  "extra": [],
+  "max_guests": 10
  },
  "9a1d2b87-a78f-4394-adde-3812edab80d8": {
   "airbnb": "1671336541122488555",
@@ -250,7 +261,8 @@
    "08:00"
   ],
   "access": "keypad",
-  "extra": []
+  "extra": [],
+  "max_guests": 8
  },
  "4b73ae9e-cd7e-4e76-ac25-e9f2a89b53d6": {
   "airbnb": "1701159122712069636",
@@ -264,7 +276,8 @@
    "08:00"
   ],
   "access": "smart lock",
-  "extra": []
+  "extra": [],
+  "max_guests": 10
  },
  "4f400be2-d85c-4fba-be22-2c39992e443e": {
   "airbnb": "1704785719104882628",
@@ -280,7 +293,8 @@
   "access": "keypad",
   "extra": [
    "No commercial photography"
-  ]
+  ],
+  "max_guests": 6
  },
  "972d8770-dc80-4512-b7b8-ced7d60233ba": {
   "airbnb": "1720558079987234839",
@@ -296,7 +310,8 @@
   "access": "smart lock",
   "extra": [
    "No commercial photography"
-  ]
+  ],
+  "max_guests": 10
  },
  "479b9aae-9485-4481-b945-3d199688f497": {
   "airbnb": "1724308232069857475",
@@ -323,7 +338,8 @@
   "access": "smart lock",
   "extra": [
    "No commercial photography"
-  ]
+  ],
+  "max_guests": 6
  },
  "9a9eb7b0-ee33-4b7b-8603-dbd61a914868": {
   "airbnb": "1726584088242395442",
@@ -339,7 +355,8 @@
   "access": "smart lock",
   "extra": [
    "No commercial photography"
-  ]
+  ],
+  "max_guests": 6
  },
  "f3919294-fb07-4a1e-939e-2c45e1594809": {
   "airbnb": "1763285534084823245",
@@ -363,7 +380,8 @@
   "access": "keypad",
   "extra": [
    "No commercial photography"
-  ]
+  ],
+  "max_guests": 8
  },
  "c2145188-45d3-4dbc-b1db-ad3371ad4f91": {
   "airbnb": "1785828045621612068",
@@ -377,6 +395,7 @@
   "extra": [],
   "before_checkout": [
    "Lock up at checkout."
-  ]
+  ],
+  "max_guests": 4
  }
 }

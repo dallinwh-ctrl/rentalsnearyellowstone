@@ -30,8 +30,10 @@ async function api(p) {
 // Every review Hospitable has for a home (all pages), for the star rating and the quotes.
 async function allReviews(id) {
   const data = [];
-  for (let page = 1; page <= 20; page++) {
-    const body = await api(`/properties/${id}/reviews?per_page=100&page=${page}`).catch(() => null);
+  let size = 50;
+  for (let page = 1; page <= 40; page++) {
+    let body = await api(`/properties/${id}/reviews?per_page=${size}&page=${page}`).catch((e) => { console.warn(String(e)); return null; });
+    if (!body && page === 1) { size = 10; body = await api(`/properties/${id}/reviews?per_page=${size}&page=1`).catch(() => null); }
     if (!body) break;
     data.push(...(body.data || []));
     if (!body.meta || page >= body.meta.last_page) break;
@@ -89,8 +91,11 @@ const stateCode = (h) => (STATES[h.address?.state] ? h.address.state : 'ID');
 const state = (h) => STATES[stateCode(h)];
 const place = (h) => `${town(h)}, ${state(h)}`;
 const townPage = (h) => TOWNS.find((t) => t.towns.includes(town(h)));
+// Town centers, used when Hospitable has no coordinates for a home.
+const TOWN_GEO = { 'Island Park': [44.42, -111.37], 'West Yellowstone': [44.66, -111.10], Ashton: [44.07, -111.45], 'St. Anthony': [43.97, -111.68], Newdale: [43.89, -111.60] };
+const geoOf = (h) => (h.geo?.lat ? h.geo : { lat: (TOWN_GEO[town(h)] || [44.42, -111.37])[0], lng: (TOWN_GEO[town(h)] || [44.42, -111.37])[1] });
 const KIND = { cabin: 'Cabin', apartment: 'Suite', house: 'Vacation Home' };
-const kind = (h) => KIND[h.property_type] || 'Vacation Rental';
+const kind = (h) => OVERRIDES[h.id]?.kind || KIND[h.property_type] || 'Vacation Rental';
 // Listing text sometimes shouts ("MINIMAL CELL SERVICE"); show runs of capitals in sentence case without changing the words.
 const unshout = (s) => s.replace(/\b[A-Z]{3,}(?:[ \t]+[A-Z]{2,})+\b/g, (m, i) => {
   const low = m.toLowerCase();
@@ -464,7 +469,8 @@ function homeDetail(h, homes = []) {
       image: imgs.slice(0, 12).map((i) => i.url), description: unshout(h.summary || ''),
       brand: { '@type': 'Brand', name: SITE.name },
       address: { '@type': 'PostalAddress', addressLocality: town(h), addressRegion: stateCode(h), addressCountry: 'US' },
-      ...(h.geo?.lat ? { latitude: h.geo.lat, longitude: h.geo.lng } : {}),
+      latitude: geoOf(h).lat, longitude: geoOf(h).lng,
+      geo: { '@type': 'GeoCoordinates', latitude: geoOf(h).lat, longitude: geoOf(h).lng },
       checkinTime: `${timesOf(h).checkin}:00`, checkoutTime: `${timesOf(h).checkout}:00`,
       knowsLanguage: 'en',
       containsPlace: {
@@ -534,6 +540,11 @@ const all = await loadHomes();
 // Hospitable's own copies are small, so these replace them when present. Airbnb's image server resizes with ?im_w=.
 const AIRBNB = JSON.parse(await readFile(path.join(ROOT, 'data/airbnb-photos.json'), 'utf8').catch(() => '{}'));
 const sized = (u, w) => `${u}?im_w=${w}`;
+// Guest counts from Airbnb where it gives an exact number (Airbnb shows "16+" above 16; those keep Hospitable's number).
+for (const h of all) {
+  const m = RULES[h.id]?.max_guests;
+  if (m && h.capacity) h.capacity = { ...h.capacity, max: m };
+}
 for (const h of all) {
   const list = AIRBNB[h.id]?.photos;
   if (Array.isArray(list) && list.length) {

@@ -8,7 +8,8 @@
     "title": "Walk to Lake Family Cabin",
     "slug": "walk-to-lake-family-cabin",
     "hidden": false,
-    "order": 1002
+    "order": 1002,
+    "kind": "Cabin"
   },
   "0dcb19ce-2935-4dda-9006-9c9be94cfc3e": {
     "title": "Trailside Yellowstone Suite",
