@@ -63,6 +63,16 @@ async function loadHomes() {
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
 const town = (h) => (h.address?.city === 'Saint Anthony' ? 'St. Anthony' : h.address?.city) || 'Idaho';
+const STATES = { ID: 'Idaho', MT: 'Montana', WY: 'Wyoming' };
+const stateCode = (h) => (STATES[h.address?.state] ? h.address.state : 'ID');
+const state = (h) => STATES[stateCode(h)];
+const place = (h) => `${town(h)}, ${state(h)}`;
+// Listing text sometimes shouts ("MINIMAL CELL SERVICE"); show runs of capitals in sentence case without changing the words.
+const unshout = (s) => s.replace(/\b[A-Z]{3,}(?:[ \t]+[A-Z]{2,})+\b/g, (m, i) => {
+  const low = m.toLowerCase();
+  const start = i === 0 || /[.!?:]\s*$/.test(s.slice(0, i)) || /^\s*$/.test(s.slice(0, i));
+  return start ? low[0].toUpperCase() + low.slice(1) : low;
+});
 
 const AMENITY_LABELS = {
   jacuzzi: 'Hot tub', hot_tub: 'Hot tub', wifi: 'Wifi', bbq: 'BBQ grill', fire_pit: 'Fire pit', fireplace: 'Fireplace',
@@ -109,7 +119,7 @@ function facts(h) {
 // Listing text -> HTML: blank-line blocks become paragraphs, "-", "•" or "*" lines become bullet lists,
 // a short line ending in ":" or with no period before a list becomes a small heading.
 function paragraphs(text) {
-  const lines = String(text || '').replace(/\r/g, '').split('\n').map((l) => l.replace(/[ \t]+/g, ' ').trim());
+  const lines = unshout(String(text || '').replace(/\r/g, '')).split('\n').map((l) => l.replace(/[ \t]+/g, ' ').trim());
   const out = [];
   let list = null;
   const close = () => { if (list) { out.push(`<ul>${list.map((li) => `<li>${esc(li).replace(/^([A-Z][\w &amp;/'’-]{1,30}):\s/, '<strong>$1:</strong> ')}</li>`).join('')}</ul>`); list = null; } };
@@ -215,6 +225,7 @@ function searchForm(extraClass = '') {
 
 function homePage(homes) {
   const towns = [...new Set(homes.map(town))];
+  const places = [...new Set(homes.map(place))];
   const order = ['Island Park', 'West Yellowstone', 'Ashton', 'St. Anthony', 'Newdale'];
   towns.sort((a, b) => (order.indexOf(a) + 99) % 99 - (order.indexOf(b) + 99) % 99);
   const body = `
@@ -257,7 +268,7 @@ function homePage(homes) {
     jsonld: {
       '@context': 'https://schema.org', '@type': 'LodgingBusiness', name: SITE.name, url: SITE.url,
       telephone: SITE.phone, email: SITE.email,
-      areaServed: towns.map((t) => ({ '@type': 'City', name: `${t}, Idaho` })),
+      areaServed: places.map((t) => ({ '@type': 'City', name: t })),
     },
   });
 }
@@ -271,12 +282,12 @@ function homeDetail(h) {
   const rules = h.house_rules || {};
   const body = `
 <div class="wrap crumbs"><a href="/#homes">← All homes</a></div>
-<section class="wrap gallery" aria-label="Photos" data-gallery>
+<section class="wrap gallery n${Math.min(imgs.length, 5) || 1}" aria-label="Photos" data-gallery>
   ${galleryTiles(imgs, o.title)}
 </section>
 <div class="wrap detail">
   <article class="detail-main">
-    <p class="eyebrow">${esc(town(h))}, Idaho</p>
+    <p class="eyebrow">${esc(place(h))}</p>
     <h1>${esc(o.title)}</h1>
     <p class="detail-facts">${esc(facts(h))}${c.beds ? ` · ${plural(c.beds, 'bed', 'beds')}` : ''}</p>
     ${sleepingRooms(h).length ? `<h2>Where you'll sleep</h2><ul class="beds">${sleepingRooms(h).map((r) => `<li><strong>${esc(r.name)}<span class="sr-sep">: </span></strong><span>${esc(r.beds)}</span></li>`).join('')}</ul>` : ''}
@@ -289,7 +300,7 @@ function homeDetail(h) {
     ${hl.length ? `<h2>What's here</h2><ul class="amenities">${hl.map((a) => `<li>${esc(a)}</li>`).join('')}</ul>` : ''}
     <h2>Good to know</h2>
     <ul class="rules">
-      <li>Check in after ${esc(fmtTime(h.checkin))}, check out by ${esc(fmtTime(h.checkout))}</li>
+      <li>Check in after ${esc(fmtTime(o.checkin || SITE.checkin || h.checkin))}, check out by ${esc(fmtTime(o.checkout || SITE.checkout || h.checkout))}</li>
       ${rules.pets_allowed === false ? '<li>No pets</li>' : rules.pets_allowed ? '<li>Pets welcome (pet fee may apply)</li>' : ''}
       ${rules.smoking_allowed === false ? '<li>No smoking</li>' : ''}
       ${rules.events_allowed === false ? '<li>No parties or events</li>' : ''}
@@ -324,15 +335,15 @@ function homeDetail(h) {
 <script type="application/json" data-photos>${JSON.stringify(imgs.map((i) => ({ url: i.url, thumb: i.thumbnail_url || i.url, caption: i.caption || '' }))).replace(/</g, '\\u003c')}</script>`;
   return layout({
     title: `${o.title} | ${town(h)} Vacation Rental Near Yellowstone`,
-    description: `${o.title} in ${town(h)}, Idaho. ${facts(h)}. ${perk(h) ? perk(h) + '. ' : ''}Check live availability and book direct.`,
+    description: `${o.title} in ${place(h)}. ${facts(h)}. ${perk(h) ? perk(h) + '. ' : ''}Check live availability and book direct.`,
     canonical: `/homes/${o.slug}/`,
     image: imgs[0]?.url,
     body,
     bodyClass: 'page-home',
     jsonld: {
       '@context': 'https://schema.org', '@type': 'VacationRental', name: o.title, url: `${SITE.url}/homes/${o.slug}/`,
-      image: imgs.slice(0, 8).map((i) => i.url), description: h.summary || '',
-      address: { '@type': 'PostalAddress', addressLocality: town(h), addressRegion: 'ID', addressCountry: 'US' },
+      image: imgs.slice(0, 8).map((i) => i.url), description: unshout(h.summary || ''),
+      address: { '@type': 'PostalAddress', addressLocality: town(h), addressRegion: stateCode(h), addressCountry: 'US' },
       containsPlace: { '@type': 'Accommodation', occupancy: { '@type': 'QuantitativeValue', maxValue: c.max }, numberOfBedrooms: c.bedrooms, numberOfBathroomsTotal: c.bathrooms },
       amenityFeature: hl.map((a) => ({ '@type': 'LocationFeatureSpecification', name: a, value: true })),
     },
@@ -346,6 +357,8 @@ const ROOM = { bedroom: 'Bedroom', living_room: 'Living room', game_room: 'Game 
 
 // Rooms with beds, in Hospitable's order: "Bedroom 1: 1 queen bed", "Living room: 1 sofa bed".
 function sleepingRooms(h) {
+  const manual = OVERRIDES[h.id]?.rooms;
+  if (!(h.room_details || []).some((r) => (r.beds || []).length) && Array.isArray(manual)) return manual;
   let n = 0;
   return (h.room_details || []).filter((r) => (r.beds || []).length).map((r) => {
     const name = r.type === 'bedroom' ? `Bedroom ${++n}` : (ROOM[r.type] || r.type.replace(/_/g, ' ').replace(/^./, (c) => c.toUpperCase()));

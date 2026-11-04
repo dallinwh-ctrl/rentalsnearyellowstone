@@ -6,7 +6,9 @@
   "email": "Info@freshpineservices.com",
   "manager_name": "Fresh Pine Services",
   "manager_owner_url": "https://www.freshpineservices.com/airbnb-management-island-park",
-  "review_line": "4.91★ from 900+ guest reviews on Airbnb and VRBO",
+  "review_line": "4.91\u2605 from 900+ guest reviews on Airbnb and VRBO",
   "direct_perk_title": "Ask us anything first",
-  "direct_perk_text": "Wondering about beds, roads, snow or the best home for your group? Call or text and you'll talk to the team that knows every home."
+  "direct_perk_text": "Wondering about beds, roads, snow or the best home for your group? Call or text and you'll talk to the team that knows every home.",
+  "checkin": "16:00",
+  "checkout": "10:00"
 }

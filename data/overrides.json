@@ -13,17 +13,35 @@
   "0dcb19ce-2935-4dda-9006-9c9be94cfc3e": {
     "title": "Trailside Yellowstone Suite",
     "slug": "trailside-yellowstone-suite",
-    "hidden": false
+    "hidden": false,
+    "rooms": [
+      {
+        "name": "Bedroom",
+        "beds": "1 queen bed"
+      }
+    ]
   },
   "1c1c6e82-a7b1-4730-ba1f-927360ed9466": {
     "title": "Targhee Loft",
     "slug": "targhee-loft",
-    "hidden": false
+    "hidden": false,
+    "rooms": [
+      {
+        "name": "Bedroom",
+        "beds": "1 queen bed"
+      }
+    ]
   },
   "d3d4ca25-6775-46d4-a055-0bd5d550e086": {
     "title": "Walk to Yellowstone Retreat",
     "slug": "walk-to-yellowstone-retreat",
-    "hidden": false
+    "hidden": false,
+    "rooms": [
+      {
+        "name": "Bedroom",
+        "beds": "1 queen bed"
+      }
+    ]
   },
   "a8fab74d-547d-47fd-8326-f7854c009c2a": {
     "title": "Rustler's Rest",
